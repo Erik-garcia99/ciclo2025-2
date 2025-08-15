@@ -1,0 +1,64 @@
+contenido: 
+
+- unidad 1 : fundamentaos de sistemas embebidos 
+- unidad 2: conectividad 
+- unidad 3: metodología de diseño de SE 
+- unidad 4 : herramientas de diseño de hardware 
+
+
+evaluación: 
+
+-exámenes (3)   - 50%
+
+- laboratorio   - 30%
+
+- proyecto     - 20%
+
+
+para excentar ordinario: 
+
+1 - aprobar todos los examanes 
+
+2- aprobar el laboratorio
+
+3 - promediar mínimo 85 de a cuerdo a los porcentajes anteriores 
+
+############################################
+
+alumno que no tenga aporbado el laboratorio debido a que no entrgaron practicas, no pueden presentar el examen 3
+
+corre: 
+
+lara.evangelina@uabc.edu.mx
+Evangelina.lara@uabc.du.mx
+
+
+1 sensor con interfaz I2C a 3.3v 
+
+1 sensor con interfaz SPI a 3.3v 
+
+1 lector de tarjeta de micro SD card con interfaz SPI que opere a 3.3V
+
+#################################################################################
+
+introducción 
+
+- sistemas embebidos 
+
+un sistema embebidos es un dispositivo que tiene una función fija, son parte de un sistema mayor. 
+
+un sistema embebido se refiere al uso de software y hardware, no se pueden separar. 
+
+
+- sistemas operador por bateria, son los que tienen mas limitaciones en energia. 
+
+- sistemas de energia limitadas, no es bateria, es otra fuente de energia pero no la red electrica. 
+
+- sistema de alta densidad, se conectan a la luz, su limitacion seria el calor genreado por la electricidad 
+
+
+
+
+
+
+
