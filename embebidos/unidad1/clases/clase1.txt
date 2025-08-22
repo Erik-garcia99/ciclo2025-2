@@ -43,8 +43,8 @@ Evangelina.lara@uabc.du.mx
 
 introducción 
 
-- sistemas embebidos 
 
+- sistemas embebidos 
 un sistema embebidos es un dispositivo que tiene una función fija, son parte de un sistema mayor. 
 
 un sistema embebido se refiere al uso de software y hardware, no se pueden separar. 

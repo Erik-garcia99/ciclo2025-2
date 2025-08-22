@@ -1,0 +1,24 @@
+
+
+clase 12 de agosto 2025 (sistemas embebios)
+
+
+- ESP32 
+
+la memoria se comunica por medio de SPI ya que se eucnetra externa, la memoria RAM se 
+enceuntra interna dentro del chip. 
+
+para cargar programa lo hacemos medinate UART. utiliza chips especiales para la conversion
+de la conexion USB a UART
+
+
+
+
+
+
+
+
+
+
+
+
