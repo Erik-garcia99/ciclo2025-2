@@ -1,0 +1,50 @@
+link del primer video:https://www.youtube.com/watch?v=o7H0WYfy-9E&list=PL-Hb9zZP9qC65SpXHnTAO0-qV6x5JxCMJ&index=9
+
+
+--freeRTOS 
+
+RTOS - real time operating system, es un compionte de software que cambia rapidamente entre tareas dando la impresion de que varios programas se ejecutan al mismo timepo. 
+
+es un mini sistema operativo diseniado para ucontroladores. 
+
+un RTOS un programa se divide e n diferentes funciones independientes llamadas tareas, estas funciones no se llaman en ninguna parte del programa simplemente se crean cada tarea se ejecuta continuamnete. en un bucle infinito (esto es importante para SE, un programa en un SE nunca termina. )
+
+
+se pueden hacer tareas en paralelo, el kernel administra los recursos y simula que estan corriendo simultaneamente cada una de estas.
+
+
+- los diferntes estado de una tarea son: 
+
+-Running
+-ready
+-blocked
+-suspended
+
+la unicaforma de poder bloquear una tarea es que si esta esta corriendo se puede bloquar, pero en un estado ready o suspendido no se puede. no hya conexion en un diagrama de estado de una tarea. 
+
+-- colas de FREERTOS << queues >> 
+
+la comunicacion estre tareas es a teavez de las cosas, los mensaje se enviar por copia, los datos se copian en la cola en lugar de que la cola almance solo una referencia a los datos. 
+
+pero una cola debe ser del mismo tipo de datos, puede ser tipos primitivos o abstractos, como estrucutras. 
+
+
+--- MUTEXES 
+
+es un tipo de semaforo de exclusion mutua, por lo que solo una tarea puede acceder a un recurso a la vez. 
+
+si tenemos 2 tareas y necesitan acceder a un recurso, se utiliza este tipo de "semaforo" que se le da una llave y por lo que nadie mas puede acceder al recurso y mientras esta no lo suelta nadie mas puede acceder al recurso. 
+
+--- binary semaphores 
+
+se utilizan para idnicar a otra tarea que puede inicar su procesa, dicha tarea esta dormida esperando que otra tarea active el semaforo. 
+
+
+
+
+
+
+
+
+
+

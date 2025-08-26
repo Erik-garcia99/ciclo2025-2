@@ -1,0 +1,41 @@
+que pide la parte 1 de la practica
+
+nos esta pidiendo: 
+
+nos pide simular una case de cobro de estacionamiento, por lo que necesitamos 8 GPIO's 
+
+4 entradas en forma de botones 
+
+4 salidas en froma de LED's
+
+solo aceptara ingreso de 1, 5, 10 y 20 pesotes 
+
+si se excede de 15 pesos el cambio se presenta en manera de leds. 
+
+se requiere una maquina de estados que presentea 7 estados posibles. < HECHO >
+
+
+-> ya definidmos los pines de entrada y salida que tendremos con los que etsremos trabajdno, lo mas comun que he hecho es un pull-UP entonces la entrada seria negada
+
+-> funcion PULL-UP - NO PRESIONADA (5V - 1 LOGICO CONSTANTE) -- PRESIONADO (0V 0 LOGICO)
+
+
+-> FUNCION DE PULL-DOWN - NO PRESIONADO (0V - 0 LOGICO) -- PRESIONADO (5V - 1 LOGICO)
+
+
+
+
+en las fucniones de entrada o salida, tenemos en entrada << gpio_get_level(GPIO_NUM_XX) nos regresa el nivel en cunado se enceuntra el GPIO
+
+
+
+como salida tenemos a gpio_set_level(GPIO_NUM_XX,0 - 1) COMO SALIDA podemos poner 1 (ON) o 0 (OFF)
+
+
+
+
+
+
+
+
+
