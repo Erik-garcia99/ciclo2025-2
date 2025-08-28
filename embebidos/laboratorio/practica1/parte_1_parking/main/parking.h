@@ -10,9 +10,9 @@
 
 //ENTRADAS
 #define UN_PESO_IN 18
-#define CINCO_PESO_IN 18
-#define DIEZ_PESO_IN 18
-#define VEINTE_PESO_IN 18
+#define CINCO_PESO_IN 19
+#define DIEZ_PESO_IN 21
+#define VEINTE_PESO_IN 22
 
 
 //GPIO de cambio
@@ -23,16 +23,29 @@
 #define VEINTE_PESO_OUT 26 
 
 //GPIO DE SALIDA, ERROR, INTRODUJO MAS DE LO PERMITIDO
-
 #define ERR_EXCESS_MONEY 33
+#define DEBOUNCE_TIME 50 
 
 
 //funciones 
 
 //funcion que incia-configura los GPIO
-
 void init_GPIO(void);
 
+
+//funcion de creacion de interrupcioens por GPIO-IN
+/*static void IRAM_ATTR gpio_UN_isr_handler(void *arg);
+static void IRAM_ATTR gpio_CINCO_isr_handler(void *arg);
+static void IRAM_ATTR gpio_DIEZ_isr_handler(void *arg);
+static void IRAM_ATTR gpio_VEINTE_isr_handler(void *arg);
+*/
+//manejador de las interupciones
+void gpio_isr_handler(void *args);
+
+void TYPE_INT(void);
+
+//tareas
+void PROCESS_INTR(void *params);
 
 
 

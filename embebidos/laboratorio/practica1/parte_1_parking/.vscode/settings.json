@@ -16,6 +16,8 @@
     "--compile-commands-dir=${workspaceFolder}\\build"
   ],
   "files.associations": {
-    "parking.h": "c"
+    "parking.h": "c",
+    "queue.h": "c",
+    "stdio.h": "c"
   }
 }

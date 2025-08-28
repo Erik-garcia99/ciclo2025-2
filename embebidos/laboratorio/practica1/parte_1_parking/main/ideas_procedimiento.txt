@@ -32,6 +32,18 @@ en las fucniones de entrada o salida, tenemos en entrada << gpio_get_level(GPIO_
 como salida tenemos a gpio_set_level(GPIO_NUM_XX,0 - 1) COMO SALIDA podemos poner 1 (ON) o 0 (OFF)
 
 
+cuales son las funciones que vamos a neceistar, o mas bien las tareas que neceistaremos hacer para hacer el procediemineto sobre el cual debemos estar trabajando para el manejo de la caseta?
+
+-> necesito una funcion que determine si se estra presionado un boton y cual es (puede ser del ejemplo con nuestro dilay que diga cual esta precionado), creo que el ejemplo ya nos lo da
+
+<< tarea, puede ser >>
+-> funcion que me vaya acumulando la cantidad de dinero que se esta ingreando, asi como el imprimrir el dienro
+
+
+-> puede ser otra funcion que de el cambio (creo que si), que de el cambio porque este cambio va a estar dado por medio de los LEDS. 
+
+
+<< como podermeoa hacer el uso de varias ISR de las interrupciones, creo que si se podria, para cada GPIO de entrada.
 
 
 
