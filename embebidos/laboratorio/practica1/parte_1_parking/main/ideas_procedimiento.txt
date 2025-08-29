@@ -45,6 +45,15 @@ cuales son las funciones que vamos a neceistar, o mas bien las tareas que neceis
 
 << como podermeoa hacer el uso de varias ISR de las interrupciones, creo que si se podria, para cada GPIO de entrada.
 
+#######ERROR######
+
+el error que aun tengo es que esta detectando tanto la subida como la bajada, entonces no se que onda 
+
+-> debemos de modificar la ISR para que sea mas estricita de cunado lea o que vlaor debe de tomar en cunetra para que no lea la subida. 
+
+
+#####MODIFICAR LA MAQUINA DE ESTADOS#####
+
 
 
 

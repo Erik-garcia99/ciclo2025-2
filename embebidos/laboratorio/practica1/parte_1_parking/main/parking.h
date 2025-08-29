@@ -24,13 +24,35 @@
 
 //GPIO DE SALIDA, ERROR, INTRODUJO MAS DE LO PERMITIDO
 #define ERR_EXCESS_MONEY 33
-#define DEBOUNCE_TIME 50 
+#define DEBOUNCE_TIME 200000 
+#define TICKET_LED 25
 
+//estados 
+
+typedef enum {
+    STATE_INITIAL=0,
+    STATE_COLLECTING,
+    STATE_PAID,
+    STATE_OVERPAID,
+    STATE_GIVING_CHANGE,
+    STATE_RECEIPT
+} vending_state_t;
+
+
+
+
+//comuncion entre tareas, por medio de las colas 
+QueueHandle_t handlerQueue, moneyQueue;
+extern vending_state_t current_state;
 
 //funciones 
 
 //funcion que incia-configura los GPIO
 void init_GPIO(void);
+
+void vending_machine(int money_acc);
+void give_change(void);
+
 
 
 //funcion de creacion de interrupcioens por GPIO-IN
@@ -46,6 +68,8 @@ void TYPE_INT(void);
 
 //tareas
 void PROCESS_INTR(void *params);
+
+void MONEY_MANAGER(void *params);
 
 
 

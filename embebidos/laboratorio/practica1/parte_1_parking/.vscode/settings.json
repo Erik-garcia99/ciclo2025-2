@@ -18,6 +18,7 @@
   "files.associations": {
     "parking.h": "c",
     "queue.h": "c",
-    "stdio.h": "c"
+    "stdio.h": "c",
+    "task.h": "c"
   }
 }
