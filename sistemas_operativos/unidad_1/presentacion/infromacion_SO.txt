@@ -1,0 +1,12 @@
+
+
+
+
+
+
+
+
+bibliografías: 
+https://distrowatch.com/table.php?distribution=popos
+
+-https://www.ionos.mx/digitalguide/servidores/configuracion/pop-os/

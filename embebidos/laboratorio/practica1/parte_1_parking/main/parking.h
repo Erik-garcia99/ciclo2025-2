@@ -39,6 +39,13 @@ typedef enum {
 } vending_state_t;
 
 
+//parte 2
+//maquina de estados de la barrera 
+/*
+-STOPPED_STATE -> estado donde el carro esta detenido esperando a que se levante la barrera. 
+
+*/
+
 
 
 //comuncion entre tareas, por medio de las colas 
@@ -52,6 +59,8 @@ void init_GPIO(void);
 
 void vending_machine(int money_acc);
 void give_change(void);
+//funcion del efecto de que levante 
+
 
 
 

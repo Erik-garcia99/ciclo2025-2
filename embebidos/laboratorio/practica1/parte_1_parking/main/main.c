@@ -43,9 +43,8 @@ void app_main(void)
     4-este es un puntero a datos que se pasan a la tarea, como estrucutras con datos que se necesiten pasar, (en mi caso estare usarnado una varibale global - por ahora ya vere si lo cambio)
     5- prioridad de la tarea, con esto de determina que tarea se ejecuta priemro, dentro de la cola de prioridades
     6-handle: puntero donde se guarda la referencia de la tarea creada. 
-    
-    
     */
+\
     xTaskCreate(PROCESS_INTR, "ISR_PROCESSOR", 2048, NULL, 1, NULL);
     xTaskCreate(MONEY_MANAGER, "MONEY_MANAGER", 2048, NULL, 2, NULL);
 
@@ -61,6 +60,7 @@ void init_GPIO(void){
     gpio_reset_pin(CINCO_PESO_IN);
     gpio_reset_pin(DIEZ_PESO_IN);
     gpio_reset_pin(VEINTE_PESO_IN);
+    gpio_reset_pin(TICKET_LED);
 
     //OUTPUT
     gpio_reset_pin(UN_PESO_OUT);
@@ -72,7 +72,7 @@ void init_GPIO(void){
     gpio_set_direction(CINCO_PESO_OUT,GPIO_MODE_OUTPUT);
     gpio_set_direction(DIEZ_PESO_OUT,GPIO_MODE_OUTPUT);
     gpio_set_direction(VEINTE_PESO_OUT,GPIO_MODE_OUTPUT);
-
+    gpio_set_direction(TICKET_LED,GPIO_MODE_OUTPUT);
     //configuracion como entrada 
     //la entrada es el que ocupa el pull-up / pull-down
 
@@ -115,6 +115,7 @@ void init_GPIO(void){
     gpio_set_level(CINCO_PESO_OUT,0);
     gpio_set_level(DIEZ_PESO_OUT,0);
     gpio_set_level(VEINTE_PESO_OUT,0);
+    gpio_set_level(TICKET_LED,0);
 }
 
 
@@ -135,12 +136,12 @@ void TYPE_INT(void){
     // gpio_set_intr_type(DIEZ_PESO_IN, GPIO_INTR_POSEDGE);
     // gpio_set_intr_type(VEINTE_PESO_IN, GPIO_INTR_POSEDGE);
 
-
+    
     gpio_set_intr_type(UN_PESO_IN, GPIO_INTR_ANYEDGE);
     gpio_set_intr_type(CINCO_PESO_IN, GPIO_INTR_ANYEDGE);
     gpio_set_intr_type(DIEZ_PESO_IN, GPIO_INTR_ANYEDGE);
     gpio_set_intr_type(VEINTE_PESO_IN, GPIO_INTR_ANYEDGE);
-
+    
     
 
     //instlar el servicio de interrupciones 
@@ -252,21 +253,18 @@ void MONEY_MANAGER(void *params)
     uint8_t received_money;
     uint8_t total_money = 0;
 
-    printf("COSTO $15 pesos");
+    printf("COSTO $15 pesos\n");
 
     while(true){
         if(xQueueReceive(moneyQueue, &received_money, portMAX_DELAY)){
-            
-            
+
             //total_money += received_money;
-            printf("dinero recibido : %d \n", total_money);
+            printf("M - dinero recibido : %d \n", received_money);
             vending_machine(received_money);
             
         }
     }
 }
-
-
 
 //varibale globla de acumulacion ACC_MONEY
 
@@ -274,71 +272,74 @@ void vending_machine(int coin_value){
 
     //debugin 
 
-    printf("estado actual %d", current_state);
+    printf("D - estado actual %d\n", current_state);
 
     switch (current_state)
     {
-        
         case STATE_INITIAL:
             //aun no se ha ingresado dinero. 
             ACC_MONEY += coin_value;   
-            printf("dinero acumulado $%d pesos", ACC_MONEY);
+            printf("I - dinero acumulado $%d pesos\n", ACC_MONEY);
 
             //ahora debemos averiguar hacia que estado ahora se dirigira  
 
             if(ACC_MONEY == 15){
                 current_state = STATE_PAID; //SE COMPLETO EL APGO
-                printf("pago completado\n");
+                printf("I - pago completado\n");
                 //printf("imprimiendo boleto!\n Buen viaje");
+                //vending_machine(0);//recurdivo para procesar el pago y no tener que precionar un x boton de nuevo para qu eprocese el pago.
+                //return;
                 
             }
             else if(ACC_MONEY > 15){
                 current_state = STATE_OVERPAID;
                 change_money = ACC_MONEY - 15; 
-                printf("cambio $%d pesos\n", change_money);
+                printf("I - cambio $%d pesos\n", change_money);
             }
             else{
                 //falta dinero
                 current_state = STATE_COLLECTING;
-                printf("FALTAN $%d pesos", 15 - ACC_MONEY);
-            }break;
+                printf("I - FALTAN $%d pesos\n", 15 - ACC_MONEY);
+            }
+            break;
 
         case STATE_COLLECTING:
             ACC_MONEY += coin_value;
-            printf("dinero acumulado $%d pesos", ACC_MONEY);
+            printf("C - dinero acumulado $%d pesos\n", ACC_MONEY);
 
             if(ACC_MONEY == 15){
                 current_state = STATE_PAID; //SE COMPLETO EL APGO
-                printf("pago completado\n");
-                //printf("imprimiendo boleto!\n Buen viaje");
+                printf("C - pago completado\n");
                 
             }
             else if(ACC_MONEY > 15){
                 current_state = STATE_OVERPAID;
                 change_money = ACC_MONEY - 15; 
-                printf("cambio $%d pesos\n", change_money);
+                printf("C - cambio $%d pesos\n", change_money);
             }
             else{
                 //falta dinero
                 current_state = STATE_COLLECTING;
-                printf("FALTAN $%d pesos", 15 - ACC_MONEY);
+                printf("C - FALTAN $%d pesos\n", 15 - ACC_MONEY);
             }break;
 
         case STATE_PAID: 
             //eastado donde ya se pago completo, sin cambio
-            printf("imprimiendo boleto!\n");
+            printf("P - imprimiendo boleto!\n");
             //prendemos el LED 25 por cerca de 3 segundos, hacinedo que "imprime el boleto"
             gpio_set_level(TICKET_LED,1);
             vTaskDelay(pdMS_TO_TICKS(3000));
             gpio_set_level(TICKET_LED,0);
+            vTaskDelay(pdMS_TO_TICKS(3000));
             current_state= STATE_RECEIPT;
-            printf("dinermo acumulado $%d pesos", ACC_MONEY);
+            printf("P - dinermo acumulado $%d pesos\n", ACC_MONEY);
             break;
 
         case STATE_OVERPAID:
             //CUNADO DI DE MAS ENTONCES NECESITO CAMBIO
-            printf("preparando el cambio de $%d pesos", change_money);
+            printf("O - preparando el cambio de $%d pesos\n", change_money);
             current_state= STATE_GIVING_CHANGE;
+
             break;
         case STATE_GIVING_CHANGE:
 
@@ -349,11 +350,11 @@ void vending_machine(int coin_value){
 
         case STATE_RECEIPT:
             //completado 
-            printf("TRNASACION COMPLETADO\nBuen viaje");
+            printf("R - TRNASACION COMPLETADO\nBuen viaje\n");
             ACC_MONEY = 0;
             change_money = 0;
             current_state = STATE_INITIAL;
-            break;
+            //break;
     }
 
     printf("estado actual %d, dinero acumulado %d\n\n", current_state, ACC_MONEY);
@@ -361,16 +362,18 @@ void vending_machine(int coin_value){
 
 void give_change(void){
 
-    int acc_change = acc_change;
-
+    int acc_change = change_money;
+    
     while(acc_change >= 10){
         //debug
         printf("10 pesos LED %d\n", DIEZ_PESO_OUT);
 
         gpio_set_level(DIEZ_PESO_OUT,1);
-        vTaskDelay(pdMS_TO_TICKS(2000)); // 2 segundos
+        vTaskDelay(2000/portTICK_PERIOD_MS);
+        //vTaskDelay(pdMS_TO_TICKS(2000)); // 2 segundos
         gpio_set_level(DIEZ_PESO_OUT,0);
-        vTaskDelay(pdMS_TO_TICKS(2000));
+        //vTaskDelay(pdMS_TO_TICKS(2000));
+        vTaskDelay(2000/portTICK_PERIOD_MS);
         acc_change -= 10;
     }
 
@@ -378,9 +381,11 @@ void give_change(void){
         //debug
         printf("5 pesos LED %d\n", CINCO_PESO_OUT);
         gpio_set_level(CINCO_PESO_OUT,1);
-        vTaskDelay(pdMS_TO_TICKS(2000)); // 2 segundos
+        //vTaskDelay(pdMS_TO_TICKS(2000)); // 2 segundos
+        vTaskDelay(2000/portTICK_PERIOD_MS);
         gpio_set_level(CINCO_PESO_OUT,0);
-        vTaskDelay(pdMS_TO_TICKS(2000));
+        // vTaskDelay(pdMS_TO_TICKS(2000));
+        vTaskDelay(2000/portTICK_PERIOD_MS);
         acc_change -= 5;
     }  
 
@@ -389,11 +394,13 @@ void give_change(void){
         //debug
         printf("1 pesos LED %d\n", UN_PESO_OUT);
         gpio_set_level(UN_PESO_OUT,1);
-        vTaskDelay(pdMS_TO_TICKS(2000)); // 2 segundos
+        //vTaskDelay(pdMS_TO_TICKS(2000)); // 2 segundos
+        vTaskDelay(2000/portTICK_PERIOD_MS);
         gpio_set_level(UN_PESO_OUT,0);
-        vTaskDelay(pdMS_TO_TICKS(2000));
+        // vTaskDelay(pdMS_TO_TICKS(2000));
+        vTaskDelay(2000/portTICK_PERIOD_MS);
         acc_change -= 1;
-    }  
+    } 
 
 
 }
