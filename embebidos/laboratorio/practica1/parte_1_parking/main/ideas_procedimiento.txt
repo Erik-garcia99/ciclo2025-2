@@ -54,9 +54,10 @@ el error que aun tengo es que esta detectando tanto la subida como la bajada, en
 
 #####MODIFICAR LA MAQUINA DE ESTADOS#####
 
+############################################################
 
+PARTE 2, ESTADOS DEL AUTOMOVIL 
 
---> modificar las funciones para procesar el pago ya que lo procesa doble la madre.
 
 
 

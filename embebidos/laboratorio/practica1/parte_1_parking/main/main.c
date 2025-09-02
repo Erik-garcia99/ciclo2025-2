@@ -131,16 +131,16 @@ void TYPE_INT(void){
 
 
     //POS
-    // gpio_set_intr_type(UN_PESO_IN, GPIO_INTR_POSEDGE);
-    // gpio_set_intr_type(CINCO_PESO_IN, GPIO_INTR_POSEDGE);
-    // gpio_set_intr_type(DIEZ_PESO_IN, GPIO_INTR_POSEDGE);
-    // gpio_set_intr_type(VEINTE_PESO_IN, GPIO_INTR_POSEDGE);
+    gpio_set_intr_type(UN_PESO_IN, GPIO_INTR_POSEDGE);
+    gpio_set_intr_type(CINCO_PESO_IN, GPIO_INTR_POSEDGE);
+    gpio_set_intr_type(DIEZ_PESO_IN, GPIO_INTR_POSEDGE);
+    gpio_set_intr_type(VEINTE_PESO_IN, GPIO_INTR_POSEDGE);
 
     
-    gpio_set_intr_type(UN_PESO_IN, GPIO_INTR_ANYEDGE);
-    gpio_set_intr_type(CINCO_PESO_IN, GPIO_INTR_ANYEDGE);
-    gpio_set_intr_type(DIEZ_PESO_IN, GPIO_INTR_ANYEDGE);
-    gpio_set_intr_type(VEINTE_PESO_IN, GPIO_INTR_ANYEDGE);
+    // gpio_set_intr_type(UN_PESO_IN, GPIO_INTR_ANYEDGE);
+    // gpio_set_intr_type(CINCO_PESO_IN, GPIO_INTR_ANYEDGE);
+    // gpio_set_intr_type(DIEZ_PESO_IN, GPIO_INTR_ANYEDGE);
+    // gpio_set_intr_type(VEINTE_PESO_IN, GPIO_INTR_ANYEDGE);
     
     
 
@@ -164,43 +164,55 @@ void IRAM_ATTR gpio_isr_handler(void *args){
     uint32_t pin_number=(uint32_t)args;
     uint64_t current_time = esp_timer_get_time();
 
+    static uint64_t last_isr_time = 0; // Tiempo de la última ISR
+
     //verificar que el pin este en alto antes de enviarlo a
     int current_state = gpio_get_level(pin_number);
 
-    switch (pin_number)
-    {
-        //un delay de 100mS para poder leer el PIN 
-        case UN_PESO_IN: {
-            if(current_state == 1 && (current_time - LAST_PRESS_UN) >DEBOUNCE_TIME){
+    if (current_time - last_isr_time < DEBOUNCE_TIME) {
+        return; // Ignorar si es demasiado pronto
+    }
+    last_isr_time = current_time;
+
+    if(gpio_get_level(pin_number) == 1){
+        
+        switch (pin_number)
+        {
+            //un delay de 100mS para poder leer el PIN 
+            case UN_PESO_IN: {
+                if(current_state == 1 && (current_time - LAST_PRESS_UN) >DEBOUNCE_TIME){
 
                 LAST_PRESS_UN = current_time;
                 xQueueSendFromISR(handlerQueue, &pin_number, NULL);
-            }
-        } break;
+                }
+            } break;
 
-        case CINCO_PESO_IN: {
-            if(current_state ==1 && (current_time - LAST_PRESS_CINCO) > DEBOUNCE_TIME){
-                LAST_PRESS_CINCO = current_time;
-                xQueueSendFromISR(handlerQueue,&pin_number,NULL);
-            }
-        }break;
+            case CINCO_PESO_IN: {
+                if(current_state ==1 && (current_time - LAST_PRESS_CINCO) > DEBOUNCE_TIME){
+                    LAST_PRESS_CINCO = current_time;
+                    xQueueSendFromISR(handlerQueue,&pin_number,NULL);
+                }
+            }break;
 
 
-        case DIEZ_PESO_IN :{
-            if(current_state == 1 && (current_time - LAST_PRESS_DIEZ) > DEBOUNCE_TIME ){
-                LAST_PRESS_DIEZ = current_time;
-                xQueueSendFromISR(handlerQueue,&pin_number,NULL);
+            case DIEZ_PESO_IN :{
+                if(current_state == 1 && (current_time - LAST_PRESS_DIEZ) > DEBOUNCE_TIME ){
+                    LAST_PRESS_DIEZ = current_time;
+                    xQueueSendFromISR(handlerQueue,&pin_number,NULL);
 
-            }
-        }break;
+                }
+            }break;
 
-        case VEINTE_PESO_IN:{
-            if(current_state == 1 && (current_time - LAST_PRESS_VEINTE) > DEBOUNCE_TIME){
-                LAST_PRESS_VEINTE = current_time;
-                xQueueSendFromISR(handlerQueue,&pin_number,NULL);
-            }
-        }break;
+            case VEINTE_PESO_IN:{
+                if(current_state == 1 && (current_time - LAST_PRESS_VEINTE) > DEBOUNCE_TIME){
+                    LAST_PRESS_VEINTE = current_time;
+                    xQueueSendFromISR(handlerQueue,&pin_number,NULL);
+                }
+            }break;
+        }
+
     }
+
 }
 
 //esta funcion es la que esta acomulando el dinero, es la funcion << PRINCIPAL >> si lo queremos ver asi. en funcionamiento del programa
@@ -289,12 +301,16 @@ void vending_machine(int coin_value){
                 //printf("imprimiendo boleto!\n Buen viaje");
                 //vending_machine(0);//recurdivo para procesar el pago y no tener que precionar un x boton de nuevo para qu eprocese el pago.
                 //return;
+                vending_machine(0);
+                return;
                 
             }
             else if(ACC_MONEY > 15){
                 current_state = STATE_OVERPAID;
                 change_money = ACC_MONEY - 15; 
                 printf("I - cambio $%d pesos\n", change_money);
+                vending_machine(0);
+                return;
             }
             else{
                 //falta dinero
@@ -310,12 +326,16 @@ void vending_machine(int coin_value){
             if(ACC_MONEY == 15){
                 current_state = STATE_PAID; //SE COMPLETO EL APGO
                 printf("C - pago completado\n");
+                vending_machine(0);
+                return;
                 
             }
             else if(ACC_MONEY > 15){
                 current_state = STATE_OVERPAID;
                 change_money = ACC_MONEY - 15; 
                 printf("C - cambio $%d pesos\n", change_money);
+                vending_machine(0);
+                return;
             }
             else{
                 //falta dinero
@@ -333,19 +353,24 @@ void vending_machine(int coin_value){
             vTaskDelay(pdMS_TO_TICKS(3000));
             current_state= STATE_RECEIPT;
             printf("P - dinermo acumulado $%d pesos\n", ACC_MONEY);
+            vending_machine(0);
+            return;
             break;
 
         case STATE_OVERPAID:
             //CUNADO DI DE MAS ENTONCES NECESITO CAMBIO
             printf("O - preparando el cambio de $%d pesos\n", change_money);
             current_state= STATE_GIVING_CHANGE;
-
+            vending_machine(0);
+            return;
             break;
         case STATE_GIVING_CHANGE:
 
             //vamos a la funcion que
             give_change();
             current_state = STATE_PAID;
+            vending_machine(0);
+            return;
             break;
 
         case STATE_RECEIPT:
