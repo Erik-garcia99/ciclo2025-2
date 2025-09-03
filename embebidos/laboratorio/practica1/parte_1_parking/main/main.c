@@ -61,18 +61,30 @@ void init_GPIO(void){
     gpio_reset_pin(DIEZ_PESO_IN);
     gpio_reset_pin(VEINTE_PESO_IN);
     gpio_reset_pin(TICKET_LED);
+    //INIT PT2 
+    gpio_reset_pin(init_vehi);
+    gpio_reset_pin(pass_vehi);
 
     //OUTPUT
     gpio_reset_pin(UN_PESO_OUT);
     gpio_reset_pin(CINCO_PESO_OUT);
     gpio_reset_pin(DIEZ_PESO_OUT);
     gpio_reset_pin(VEINTE_PESO_OUT);
+    //salida PT2
+    gpio_config(_DOWN_);
+    gpio_reset_pin(_MIDDLE_);
+    gpio_reset_pin(_UP_);
     //configuracion como salida 
     gpio_set_direction(UN_PESO_OUT,GPIO_MODE_OUTPUT);
     gpio_set_direction(CINCO_PESO_OUT,GPIO_MODE_OUTPUT);
     gpio_set_direction(DIEZ_PESO_OUT,GPIO_MODE_OUTPUT);
     gpio_set_direction(VEINTE_PESO_OUT,GPIO_MODE_OUTPUT);
     gpio_set_direction(TICKET_LED,GPIO_MODE_OUTPUT);
+    //SALIDA PT2
+    gpio_set_direction(_DOWN_,GPIO_MODE_OUTPUT);
+    gpio_set_direction(_MIDDLE_,GPIO_MODE_OUTPUT);
+    gpio_set_direction(_UP_,GPIO_MODE_OUTPUT);
+
     //configuracion como entrada 
     //la entrada es el que ocupa el pull-up / pull-down
 
@@ -80,6 +92,10 @@ void init_GPIO(void){
     gpio_set_direction(CINCO_PESO_IN,GPIO_MODE_INPUT);
     gpio_set_direction(DIEZ_PESO_IN,GPIO_MODE_INPUT);
     gpio_set_direction(VEINTE_PESO_IN,GPIO_MODE_INPUT);
+    //entrada PT2
+    gpio_set_direction(init_vehi,GPIO_MODE_INPUT);
+    gpio_set_direction(pass_vehi,GPIO_MODE_DEF_INPUT);
+
 
     //trabajemos por pull-up enable 
 
@@ -109,6 +125,13 @@ void init_GPIO(void){
 
     gpio_pullup_dis(VEINTE_PESO_IN);
     gpio_pulldown_en(VEINTE_PESO_IN);
+
+    gpio_pullup_dis(init_vehi);
+    gpio_pulldown_en(init_vehi);
+
+    gpio_pullup_dis(pass_vehi);
+    gpio_pulldown_en(pass_vehi);
+
     //inicamos los pines de salida << estare jugando para prbarlos, pero deben deestar todos abajo, en una condicion incial>>
 
     gpio_set_level(UN_PESO_OUT,0);
@@ -116,6 +139,11 @@ void init_GPIO(void){
     gpio_set_level(DIEZ_PESO_OUT,0);
     gpio_set_level(VEINTE_PESO_OUT,0);
     gpio_set_level(TICKET_LED,0);
+    //salida inical PT2
+    gpio_set_level(_DOWN_,0);
+    gpio_set_level(_MIDDLE_,0);
+    gpio_set_level(_UP_,0);
+
 }
 
 
@@ -142,6 +170,10 @@ void TYPE_INT(void){
     // gpio_set_intr_type(DIEZ_PESO_IN, GPIO_INTR_ANYEDGE);
     // gpio_set_intr_type(VEINTE_PESO_IN, GPIO_INTR_ANYEDGE);
     
+    //DEBEMOS AGREGAR PARA LOS NUEVOS BOTOSONES 
+
+    gpio_set_intr_type(init_vehi,GPIO_INTR_POSEDGE);
+    gpio_set_intr_type(pass_vehi,GPIO_INTR_POSEDGE);
     
 
     //instlar el servicio de interrupciones 
@@ -155,6 +187,12 @@ void TYPE_INT(void){
     gpio_isr_handler_add(CINCO_PESO_IN,gpio_isr_handler, (void *)CINCO_PESO_IN);
     gpio_isr_handler_add(VEINTE_PESO_IN,gpio_isr_handler, (void *)VEINTE_PESO_IN);
 
+    //###################################################################
+    //INTERRUPCION pt2, creo que para esta mejor mandemosla a otra funcion a aprte para tener separados estos 2 grupos de botones. 
+
+    gpio_isr_handler_add(init_vehi,gpio_isr_handler,(void *)init_vehi);
+    gpio_isr_handler_add(pass_vehi,gpio_isr_handler,(void *)pass_vehi);
+//###################################################################
 
 }
 
