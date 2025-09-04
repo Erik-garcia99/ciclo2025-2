@@ -58,6 +58,30 @@ el error que aun tengo es que esta detectando tanto la subida como la bajada, en
 
 PARTE 2, ESTADOS DEL AUTOMOVIL 
 
+-> funciones que vamoa a neceistar
+
+############################## proeceso de decision
+
+-> en la funcion que recibe la interrupcion se mandara por medio de la cola << que pin >> es el que esta precionando. << tarea >>
+
+-> estado << STATE_RECEIPT >> en este estado es el que va a indicar que se completo la operacion 
+
+
+
+-> FUNCION << update_needle_leds >>, necsito una forma para en el momento que se interrupte la secuencia dependieod de enque flanco se encunetre, saber hacia donde debe de regresary conocer su estado acutual como el anterior 
+
+    -> podriamos hacer 2 swtch-case anidados y otro parametro que indique el flanco. 
+
+    -> necitamos una funcion o otra tarea que procese cunado la secuencia se interrumpe
+
+    #################
+    aun no complentod muy bien lo de la interrupcio, primero hagamoslo asi como viene despues viendo el funcionamineto ya veo que conda
+    #################
+
+
+#############################
+
+
 
 
 

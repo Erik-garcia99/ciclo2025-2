@@ -11,6 +11,11 @@ static uint64_t LAST_PRESS_UN=0;
 static uint64_t LAST_PRESS_CINCO=0;
 static uint64_t LAST_PRESS_DIEZ=0;
 static uint64_t LAST_PRESS_VEINTE=0;
+//para el grupo de vehiculos 
+static uint64_t LAST_PRESS_INIT_VEHI =0;
+static uint64_t LAST_PRESS_PASS_VEHI = 0;
+
+
 QueueHandle_t handlerQueue;
 QueueHandle_t moneyQueue;
 
@@ -24,12 +29,20 @@ static int ACC_MONEY = 0;
 static int change_money = 0;
 vending_state_t current_state = STATE_INITIAL;
 
+barrier_state_t current_barrier_state = BARRIER_WAITING;
+bool pyment_completed= false;
+bool vehicle_waiting= false;
+
+
+
+state_needle_t curren_state_needle;
 
 void app_main(void)
 {
     //creacion de cola 
     handlerQueue = xQueueCreate(10, sizeof(uint32_t));
     moneyQueue = xQueueCreate(10, sizeof(uint32_t));
+    vehicleQueue = xQueueCreate(10, sizeof(uint32_t));
 
     init_GPIO();
     TYPE_INT();
@@ -47,6 +60,8 @@ void app_main(void)
 \
     xTaskCreate(PROCESS_INTR, "ISR_PROCESSOR", 2048, NULL, 1, NULL);
     xTaskCreate(MONEY_MANAGER, "MONEY_MANAGER", 2048, NULL, 2, NULL);
+    //tarea para PT2
+    xTaskCreate(STEP_VEHI,"STEP_VEHI",2048,NULL,3,NULL);
 
     
 }
@@ -69,16 +84,16 @@ void init_GPIO(void){
     gpio_reset_pin(UN_PESO_OUT);
     gpio_reset_pin(CINCO_PESO_OUT);
     gpio_reset_pin(DIEZ_PESO_OUT);
-    gpio_reset_pin(VEINTE_PESO_OUT);
+    
     //salida PT2
-    gpio_config(_DOWN_);
+    gpio_reset_pin(_DOWN_);
     gpio_reset_pin(_MIDDLE_);
     gpio_reset_pin(_UP_);
     //configuracion como salida 
     gpio_set_direction(UN_PESO_OUT,GPIO_MODE_OUTPUT);
     gpio_set_direction(CINCO_PESO_OUT,GPIO_MODE_OUTPUT);
     gpio_set_direction(DIEZ_PESO_OUT,GPIO_MODE_OUTPUT);
-    gpio_set_direction(VEINTE_PESO_OUT,GPIO_MODE_OUTPUT);
+    
     gpio_set_direction(TICKET_LED,GPIO_MODE_OUTPUT);
     //SALIDA PT2
     gpio_set_direction(_DOWN_,GPIO_MODE_OUTPUT);
@@ -94,7 +109,7 @@ void init_GPIO(void){
     gpio_set_direction(VEINTE_PESO_IN,GPIO_MODE_INPUT);
     //entrada PT2
     gpio_set_direction(init_vehi,GPIO_MODE_INPUT);
-    gpio_set_direction(pass_vehi,GPIO_MODE_DEF_INPUT);
+    gpio_set_direction(pass_vehi,GPIO_MODE_INPUT);
 
 
     //trabajemos por pull-up enable 
@@ -137,12 +152,15 @@ void init_GPIO(void){
     gpio_set_level(UN_PESO_OUT,0);
     gpio_set_level(CINCO_PESO_OUT,0);
     gpio_set_level(DIEZ_PESO_OUT,0);
-    gpio_set_level(VEINTE_PESO_OUT,0);
+    
     gpio_set_level(TICKET_LED,0);
     //salida inical PT2
     gpio_set_level(_DOWN_,0);
     gpio_set_level(_MIDDLE_,0);
     gpio_set_level(_UP_,0);
+
+    curren_state_needle = STATE_DOWN;
+    update_needle_leds(STATE_DOWN,true);//inicamos con el led que indica abajo prendid. y por defual lo marcamos que esta abajo que va a acender la aguja
 
 }
 
@@ -247,11 +265,29 @@ void IRAM_ATTR gpio_isr_handler(void *args){
                     xQueueSendFromISR(handlerQueue,&pin_number,NULL);
                 }
             }break;
+
+            //######################################################
+            //los GPIO que escogi ya los habia configurado para le primera parte, por lo que no cuentan, debo de cambiarlos, pero ahoria no me acuerdo que pines estan libres en mi ESP
+            //estamos enviando pero ahora a otra cola 
+            case init_vehi:
+                if(current_state == 1 && (current_time - LAST_PRESS_INIT_VEHI) > DEBOUNCE_TIME){
+                    LAST_PRESS_INIT_VEHI = current_time;
+                    xQueueSendFromISR(vehicleQueue, &pin_number,NULL);
+                }
+                break;
+            case pass_vehi:{
+                if(current_state == 1 && (current_time - LAST_PRESS_PASS_VEHI) > DEBOUNCE_TIME){
+                    LAST_PRESS_PASS_VEHI = current_time;
+                    xQueueSendFromISR(vehicleQueue,&pin_number,NULL);
+                }
+            }break;
         }
 
     }
 
 }
+
+
 
 //esta funcion es la que esta acomulando el dinero, es la funcion << PRINCIPAL >> si lo queremos ver asi. en funcionamiento del programa
 void PROCESS_INTR(void *params){
@@ -299,12 +335,9 @@ void PROCESS_INTR(void *params){
 
 void MONEY_MANAGER(void *params)
 {
-    
     uint8_t received_money;
-    uint8_t total_money = 0;
-
+    
     printf("COSTO $15 pesos\n");
-
     while(true){
         if(xQueueReceive(moneyQueue, &received_money, portMAX_DELAY)){
 
@@ -321,6 +354,11 @@ void MONEY_MANAGER(void *params)
 void vending_machine(int coin_value){
 
     //debugin 
+    //##########3
+    /*
+    varibale local que indica si esta preparado para salir 
+    como solo necesitamos saber si ya se completo el proceso por el cual le da salida al vehiculo solo tomaremos un valor booleano, true o false 
+    */
 
     printf("D - estado actual %d\n", current_state);
 
@@ -417,7 +455,10 @@ void vending_machine(int coin_value){
             ACC_MONEY = 0;
             change_money = 0;
             current_state = STATE_INITIAL;
-            //break;
+            //aqui irea la comunicacion con la funcion que proceso a los vehiculos, la cola con la que va a comunicar.
+            pyment_completed = true;
+            printf("listo para procesar al vehiculo\n");
+            break;
     }
 
     printf("estado actual %d, dinero acumulado %d\n\n", current_state, ACC_MONEY);
@@ -469,6 +510,240 @@ void give_change(void){
 }
 
 
+//################### FUNCIONES PT2
+/*
+-> primero necesitamos la funcion que controlara la interrupcion para el grupo de vehiculoa.
+en esta funcion se recibira que boton es el que se esta leyendo
+
+*/
+
+
+
+
+//funcion PRINCIPAL como queramos verla en la cual se realziaran la transicion entre los diferentes estados para el vehiculo 
+void STEP_VEHI(void *params){
+
+    //va a recibir cual es el boton que se preciono 
+
+    int vehi_pos;
+
+    while(true){
+        if(xQueueReceive(vehicleQueue,&vehi_pos,portMAX_DELAY)){
+
+            printf("posicion actual del vehiculo\n");
+
+            if(vehi_pos == init_vehi){
+                printf("vehiculo en esprea : GPIO %d\n",init_vehi);
+            }
+            else{
+                printf("vehiculo en movimiento: GPIO: %d\n", pass_vehi);
+            }
+        }
+        //de aqui a mandar a otra funcion
+        barrier_state_machine(vehi_pos);
+    }
+}
+
+
+
+void barrier_state_machine(int vehi_pos){
+
+    printf("estado de la barrera: %d : GPIO : %d",current_barrier_state,vehi_pos);
+
+
+    switch(current_barrier_state){
+
+        case BARRIER_WAITING:
+            //si estoy esperando, pero solo entrara solo se porgra hacer un proceso siempre y cunado se haya precionado el boton y se haya completado el pago 
+
+            if(vehi_pos == init_vehi){
+
+                //se completo el pago
+                if(pyment_completed){
+
+                    printf("vehiculo detectado - inicacion elevacion de barrea\n");
+                    vehicle_waiting = true;
+                    current_barrier_state = BARRIER_RAISING;
+                    xTaskCreate(raise_needle_task,"RAISE_NEEDLE", 2048, NULL, 4, NULL);
+                }
+                else{
+                    //se preciono peor no se completo el pago 
+                    printf("no se ha completado el pago \n barrera cerrada");
+                    //tarea que levantara la aguja
+                   
+                }
+                
+            }
+            break;
+
+        case BARRIER_RAISING: {
+
+            printf("Elevando... ignorando botones durante la secuencia\n");
+            //barrier_state_machine(current_barrier_state);
+            //return;
+            /*
+            if(vehi_pos == pass_vehi){
+                //esperamos hastaq ue se precione el boton que indica que esta pasando el vehiculo
+                //pero recordando que este proceso puede ser interrumpido
+                printf("vehiculo pasadno - elevacion interrumpida");
+                current_barrier_state = BARRIER_INTERRUPTED;
+                vehicle_waiting = false; 
+                return;
+            }*/
+            //si termina de salir cambia a BARRIE_UP
+        }break;
+
+        case BARRIER_UP:{
+            if(vehi_pos == pass_vehi){
+                printf("vehiculo ha pasdo - inciando decenso");
+                vTaskDelay(2000/portTICK_PERIOD_MS); //esperando
+                
+                vehicle_waiting=false;
+                current_barrier_state= BARRIER_LOWERING;
+                xTaskCreate(lower_needle_task,"LOWER_NEEDLE",2048,NULL,4,NULL);
+            }
+            break;
+        }
+
+
+
+        case BARRIER_LOWERING:{
+
+            printf("Bajando... ignorando botones durante la secuencia\n");
+            /*if(vehi_pos == pass_vehi){
+                printf("nuevo vehiculo detectado - interrumpiedo decenso\n");
+                current_barrier_state=BARRIER_INTERRUPTED;
+                vehicle_waiting=true;
+
+            }*/
+            //si se termina de bajar cambias a BARRIER_WAITING
+        }break;
+
+        case BARRIER_INTERRUPTED:{
+
+            if(vehi_pos == init_vehi && !vehicle_waiting){
+                printf("reanudando elevacion desde interrumpcion\n");
+                vehicle_waiting=true;
+                current_barrier_state=BARRIER_RAISING;
+                xTaskCreate(raise_needle_task,"RAISE_NEEDLE", 2048, NULL, 4, NULL);
+            }
+            else if(vehi_pos == pass_vehi && vehicle_waiting){
+                printf("vehiculo pasndo contnuando decenso");
+                vehicle_waiting=false;
+                current_barrier_state=BARRIER_LOWERING;
+                xTaskCreate(lower_needle_task,"LOWER_NEEDLE",2048,NULL,4,NULL);
+            }
+
+        }break;
+
+
+    }
+}
+
+
+void update_needle_leds(state_needle_t needle_state, bool is_raising){
+    if(is_raising){
+        switch(needle_state){
+            case STATE_DOWN:
+                gpio_set_level(_DOWN_, 1);
+                gpio_set_level(_MIDDLE_, 0);
+                gpio_set_level(_UP_, 0);
+                break;
+            case STATE_MIDDLE:
+                gpio_set_level(_DOWN_, 1);      
+                gpio_set_level(_MIDDLE_, 1);    
+                gpio_set_level(_UP_, 0);
+                break;
+            case STATE_UP:
+                gpio_set_level(_DOWN_, 1);      
+                gpio_set_level(_MIDDLE_, 1);    
+                gpio_set_level(_UP_, 1);        
+                break;
+        }
+    }
+    else{
+        switch(needle_state){
+            case STATE_MIDDLE:
+                gpio_set_level(_DOWN_, 1);      
+                gpio_set_level(_MIDDLE_, 1);    
+                gpio_set_level(_UP_, 0);      
+                break;
+            case STATE_DOWN:
+                gpio_set_level(_DOWN_, 1);   
+                gpio_set_level(_MIDDLE_, 0); 
+                gpio_set_level(_UP_, 0);
+                break;
+            default:
+                break;
+        }
+    }
+}
+
+
+void raise_needle_task(void *params){
+
+    /*
+    la seceuncia es DOWN -> MIDDLE -> UP
+
+    pero tiene la codnicion de que esta operacion puede ser interrumpida, en este caso como se encuentra elevando en cualquier momento de los 3 estaods puede ser interrumpido y en este caso la aguja empezara a bajar. 
+
+    para poder lograr esto, necesitamos verificar que la doncicion no se ha interrumpido, se interrumpe cunado se presiona el boton que indica que hay un vehiculo esperando el GPIO 15 << init_vehi >>
+    
+    */
+
+    printf("inciando elevacion");
+
+    if(current_barrier_state == BARRIER_RAISING && curren_state_needle== STATE_DOWN ){
+        //prendemos el led que indica la posicion abajo
+        //DOWN -> MIDDLE
+
+        curren_state_needle = STATE_MIDDLE;
+        update_needle_leds(STATE_MIDDLE,true);
+        printf("posicion media\n");
+        vTaskDelay(2000/portTICK_PERIOD_MS); //espera 2 segundos
+
+    }
+
+    if(current_barrier_state == BARRIER_RAISING && curren_state_needle==STATE_MIDDLE){
+            //MIDDLE -> UP
+            curren_state_needle = STATE_UP;
+            update_needle_leds(STATE_UP,true);
+            printf("aguja arriba \n");
+            current_barrier_state =  BARRIER_UP; //barrera completamente arriba
+            vTaskDelay(2000/portTICK_PERIOD_MS); //espera 2 segundos 
+    
+    }
+    vTaskDelete(NULL); //elimina tarea
+}
+
+
+void lower_needle_task(void *params){
+    
+    printf("iniciando secuencia de decenso\n");
+
+    // UP -> MIDDLE
+    if(current_barrier_state == BARRIER_LOWERING && curren_state_needle== STATE_UP){
+        curren_state_needle= STATE_MIDDLE;
+        update_needle_leds(STATE_MIDDLE,false); //decenso
+        printf("aguja posicion media - LOWER");
+        vTaskDelay(2000/portTICK_PERIOD_MS);    
+    }
+
+    if(current_barrier_state == BARRIER_LOWERING && curren_state_needle==STATE_MIDDLE){
+        // MIDDLE -> DOWN
+        curren_state_needle = STATE_DOWN;
+        update_needle_leds(STATE_DOWN,false);
+        printf("aguja posicion BAJO - LOWER");
+        pyment_completed=false;
+        vehicle_waiting=false;
+        current_barrier_state= BARRIER_WAITING;
+        vTaskDelay(2000/portTICK_PERIOD_MS);
+
+    }
+
+    
+    vTaskDelete(NULL);
+}
 
 
 
