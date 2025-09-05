@@ -181,7 +181,7 @@ void STEP_VEHI(void *params);
 void barrier_state_machine(int vehi_pos);
 
 //funcion que actualiza los GPIO dependeindo del estado en que se encuentren 
-
+    
 void update_needle_leds(state_needle_t needle_state, bool is_raising);
 
 //tarea que se encarga de levantar la aguja 

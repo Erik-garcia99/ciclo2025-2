@@ -548,7 +548,7 @@ void STEP_VEHI(void *params){
 
 void barrier_state_machine(int vehi_pos){
 
-    printf("estado de la barrera: %d : GPIO : %d",current_barrier_state,vehi_pos);
+    printf("estado de la barrera: %d : GPIO : %d\n",current_barrier_state,vehi_pos);
 
 
     switch(current_barrier_state){
@@ -568,7 +568,7 @@ void barrier_state_machine(int vehi_pos){
                 }
                 else{
                     //se preciono peor no se completo el pago 
-                    printf("no se ha completado el pago \n barrera cerrada");
+                    printf("no se ha completado el pago \n barrera cerrada\n");
                     //tarea que levantara la aguja
                    
                 }
@@ -578,7 +578,7 @@ void barrier_state_machine(int vehi_pos){
 
         case BARRIER_RAISING: {
 
-            printf("Elevando... ignorando botones durante la secuencia\n");
+            printf("Elevando... \n");
             //barrier_state_machine(current_barrier_state);
             //return;
             /*
@@ -595,7 +595,7 @@ void barrier_state_machine(int vehi_pos){
 
         case BARRIER_UP:{
             if(vehi_pos == pass_vehi){
-                printf("vehiculo ha pasdo - inciando decenso");
+                printf("vehiculo ha pasdo - inciando decenso\n");
                 vTaskDelay(2000/portTICK_PERIOD_MS); //esperando
                 
                 vehicle_waiting=false;
@@ -609,7 +609,7 @@ void barrier_state_machine(int vehi_pos){
 
         case BARRIER_LOWERING:{
 
-            printf("Bajando... ignorando botones durante la secuencia\n");
+            printf("Bajando... \n");
             /*if(vehi_pos == pass_vehi){
                 printf("nuevo vehiculo detectado - interrumpiedo decenso\n");
                 current_barrier_state=BARRIER_INTERRUPTED;
@@ -628,7 +628,7 @@ void barrier_state_machine(int vehi_pos){
                 xTaskCreate(raise_needle_task,"RAISE_NEEDLE", 2048, NULL, 4, NULL);
             }
             else if(vehi_pos == pass_vehi && vehicle_waiting){
-                printf("vehiculo pasndo contnuando decenso");
+                printf("vehiculo pasndo contnuando decenso\n");
                 vehicle_waiting=false;
                 current_barrier_state=BARRIER_LOWERING;
                 xTaskCreate(lower_needle_task,"LOWER_NEEDLE",2048,NULL,4,NULL);
@@ -691,7 +691,7 @@ void raise_needle_task(void *params){
     
     */
 
-    printf("inciando elevacion");
+    printf("inciando elevacion\n");
 
     if(current_barrier_state == BARRIER_RAISING && curren_state_needle== STATE_DOWN ){
         //prendemos el led que indica la posicion abajo
@@ -725,7 +725,7 @@ void lower_needle_task(void *params){
     if(current_barrier_state == BARRIER_LOWERING && curren_state_needle== STATE_UP){
         curren_state_needle= STATE_MIDDLE;
         update_needle_leds(STATE_MIDDLE,false); //decenso
-        printf("aguja posicion media - LOWER");
+        printf("aguja posicion media - LOWER\n");
         vTaskDelay(2000/portTICK_PERIOD_MS);    
     }
 
@@ -733,7 +733,7 @@ void lower_needle_task(void *params){
         // MIDDLE -> DOWN
         curren_state_needle = STATE_DOWN;
         update_needle_leds(STATE_DOWN,false);
-        printf("aguja posicion BAJO - LOWER");
+        printf("aguja posicion BAJO - LOWER\n");
         pyment_completed=false;
         vehicle_waiting=false;
         current_barrier_state= BARRIER_WAITING;
