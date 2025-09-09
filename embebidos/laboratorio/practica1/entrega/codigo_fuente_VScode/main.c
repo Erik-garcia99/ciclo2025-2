@@ -19,7 +19,7 @@ static uint64_t LAST_PRESS_PASS_VEHI = 0;
 QueueHandle_t handlerQueue;
 QueueHandle_t moneyQueue;
 
-//simon
+
 
 //definamos nuestros pines de entrada y de salida 
 //necesitamos los 4 pines para la entrada de botones
@@ -34,6 +34,7 @@ bool pyment_completed= false;
 bool vehicle_waiting= false;
 
 
+
 state_needle_t curren_state_needle;
 
 void app_main(void)
@@ -46,17 +47,8 @@ void app_main(void)
     init_GPIO();
     TYPE_INT();
 
-    //parametros
-    /*
-    parametros: 
-    1-puntero a la funcion que contendra el codigo de la tarea. 
-    2- un nomsbre descriptivo, este es un nombre que identifica a la tarea, puede ser cualquiera que nosotros queramos 
-    3-un tamanio de de stack, este funciona para guardar vairbales, valores, etc. lo que vamos a ocupar, lo mas normal para una tarea simple puede de 1024 Bytes a 2048 bytes, mas completas puede ir a 4096 bytes o mas.
-    4-este es un puntero a datos que se pasan a la tarea, como estrucutras con datos que se necesiten pasar, (en mi caso estare usarnado una varibale global - por ahora ya vere si lo cambio)
-    5- prioridad de la tarea, con esto de determina que tarea se ejecuta priemro, dentro de la cola de prioridades
-    6-handle: puntero donde se guarda la referencia de la tarea creada. 
-    */
-\
+
+
     xTaskCreate(PROCESS_INTR, "ISR_PROCESSOR", 2048, NULL, 1, NULL);
     xTaskCreate(MONEY_MANAGER, "MONEY_MANAGER", 2048, NULL, 2, NULL);
     //tarea para PT2
@@ -110,23 +102,6 @@ void init_GPIO(void){
     gpio_set_direction(init_vehi,GPIO_MODE_INPUT);
     gpio_set_direction(pass_vehi,GPIO_MODE_INPUT);
 
-
-    //trabajemos por pull-up enable 
-
-    /*pull-up EN
-    gpio_pullup_en(UN_PESO_IN);
-    gpio_pulldown_dis(UN_PESO_IN);
-
-    gpio_pullup_en(CINCO_PESO_IN);
-    gpio_pulldown_dis(CINCO_PESO_IN);
-
-    gpio_pullup_en(DIEZ_PESO_IN);
-    gpio_pulldown_dis(DIEZ_PESO_IN);
-
-    gpio_pullup_en(VEINTE_PESO_IN);
-    gpio_pulldown_dis(VEINTE_PESO_IN);
-    */
-
     //pull-up DIS
     gpio_pullup_dis(UN_PESO_IN);
     gpio_pulldown_en(UN_PESO_IN);
@@ -166,28 +141,14 @@ void init_GPIO(void){
 
 void TYPE_INT(void){
 
-    //todos seran en un cunado ocurra un franco ascendente 
     
-    //NEG
-    // gpio_set_intr_type(UN_PESO_IN, GPIO_INTR_NEGEDGE);
-    // gpio_set_intr_type(CINCO_PESO_IN, GPIO_INTR_NEGEDGE);
-    // gpio_set_intr_type(DIEZ_PESO_IN, GPIO_INTR_NEGEDGE);
-    // gpio_set_intr_type(VEINTE_PESO_IN, GPIO_INTR_NEGEDGE);
-
-
-    //POS
     gpio_set_intr_type(UN_PESO_IN, GPIO_INTR_POSEDGE);
     gpio_set_intr_type(CINCO_PESO_IN, GPIO_INTR_POSEDGE);
     gpio_set_intr_type(DIEZ_PESO_IN, GPIO_INTR_POSEDGE);
     gpio_set_intr_type(VEINTE_PESO_IN, GPIO_INTR_POSEDGE);
 
     
-    // gpio_set_intr_type(UN_PESO_IN, GPIO_INTR_ANYEDGE);
-    // gpio_set_intr_type(CINCO_PESO_IN, GPIO_INTR_ANYEDGE);
-    // gpio_set_intr_type(DIEZ_PESO_IN, GPIO_INTR_ANYEDGE);
-    // gpio_set_intr_type(VEINTE_PESO_IN, GPIO_INTR_ANYEDGE);
     
-    //DEBEMOS AGREGAR PARA LOS NUEVOS BOTOSONES 
 
     gpio_set_intr_type(init_vehi,GPIO_INTR_POSEDGE);
     gpio_set_intr_type(pass_vehi,GPIO_INTR_POSEDGE);
@@ -203,13 +164,10 @@ void TYPE_INT(void){
     gpio_isr_handler_add(DIEZ_PESO_IN,gpio_isr_handler, (void *)DIEZ_PESO_IN);
     gpio_isr_handler_add(CINCO_PESO_IN,gpio_isr_handler, (void *)CINCO_PESO_IN);
     gpio_isr_handler_add(VEINTE_PESO_IN,gpio_isr_handler, (void *)VEINTE_PESO_IN);
-
-    //###################################################################
-    //INTERRUPCION pt2, creo que para esta mejor mandemosla a otra funcion a aprte para tener separados estos 2 grupos de botones. 
+ 
 
     gpio_isr_handler_add(init_vehi,gpio_isr_handler,(void *)init_vehi);
     gpio_isr_handler_add(pass_vehi,gpio_isr_handler,(void *)pass_vehi);
-//###################################################################
 
 }
 
@@ -219,7 +177,7 @@ void IRAM_ATTR gpio_isr_handler(void *args){
     uint32_t pin_number=(uint32_t)args;
     uint64_t current_time = esp_timer_get_time();
 
-    static uint64_t last_isr_time = 0; // Tiempo de la última ISR
+    static uint64_t last_isr_time = 0; 
 
     //verificar que el pin este en alto antes de enviarlo a
     int current_state = gpio_get_level(pin_number);
@@ -265,9 +223,7 @@ void IRAM_ATTR gpio_isr_handler(void *args){
                 }
             }break;
 
-            //######################################################
-            //los GPIO que escogi ya los habia configurado para le primera parte, por lo que no cuentan, debo de cambiarlos, pero ahoria no me acuerdo que pines estan libres en mi ESP
-            //estamos enviando pero ahora a otra cola 
+           
             case init_vehi:
                 if(current_state == 1 && (current_time - LAST_PRESS_INIT_VEHI) > DEBOUNCE_TIME){
                     LAST_PRESS_INIT_VEHI = current_time;
@@ -297,11 +253,7 @@ void PROCESS_INTR(void *params){
     //toda tarea debe de tener un ciclo infinito, cuna asi hayan 2, 3, 4 todas deben de tener su ciclo infinito. 
     while (true)
     {
-        /**
-         * tercer parametro, hace referencia al tiempo maximo de expera, esto es que la tarea estara bloqueda esperando que llegue un elemento a la cola. << recordando que las tareas que comunican entre ellas por medio de la colas >>, pueden ser 0, que no espera, 1 - reresenta tocks a esperas
-         * 
-         * o portMAX_delay, esn este caso se bloquea hasta que llegue algo.
-         */
+        
         if(xQueueReceive(handlerQueue, &pin_number, portMAX_DELAY)){
 
             switch(pin_number){
@@ -352,12 +304,7 @@ void MONEY_MANAGER(void *params)
 
 void vending_machine(int coin_value){
 
-    //debugin 
-    //##########3
-    /*
-    varibale local que indica si esta preparado para salir 
-    como solo necesitamos saber si ya se completo el proceso por el cual le da salida al vehiculo solo tomaremos un valor booleano, true o false 
-    */
+
 
     printf("D - estado actual %d\n", current_state);
 
@@ -373,9 +320,7 @@ void vending_machine(int coin_value){
             if(ACC_MONEY == 15){
                 current_state = STATE_PAID; //SE COMPLETO EL APGO
                 printf("I - pago completado\n");
-                //printf("imprimiendo boleto!\n Buen viaje");
-                //vending_machine(0);//recurdivo para procesar el pago y no tener que precionar un x boton de nuevo para qu eprocese el pago.
-                //return;
+             
                 vending_machine(0);
                 return;
                 
@@ -509,20 +454,11 @@ void give_change(void){
 }
 
 
-//################### FUNCIONES PT2
-/*
--> primero necesitamos la funcion que controlara la interrupcion para el grupo de vehiculoa.
-en esta funcion se recibira que boton es el que se esta leyendo
-
-*/
-
-
 
 
 //funcion PRINCIPAL como queramos verla en la cual se realziaran la transicion entre los diferentes estados para el vehiculo 
 void STEP_VEHI(void *params){
 
-    //va a recibir cual es el boton que se preciono 
 
     int vehi_pos;
 
@@ -544,105 +480,6 @@ void STEP_VEHI(void *params){
 }
 
 
-/*
-void barrier_state_machine(int vehi_pos){
-
-    printf("estado de la barrera: %d : GPIO : %d\n",current_barrier_state,vehi_pos);
-
-
-    switch(current_barrier_state){
-
-        case BARRIER_WAITING:
-            //si estoy esperando, pero solo entrara solo se porgra hacer un proceso siempre y cunado se haya precionado el boton y se haya completado el pago 
-
-            if(vehi_pos == init_vehi){
-
-                //se completo el pago
-                if(pyment_completed){
-
-                    printf("vehiculo detectado - inicacion elevacion de barrea\n");
-                    vehicle_waiting = true;
-                    current_barrier_state = BARRIER_RAISING;
-                    xTaskCreate(raise_needle_task,"RAISE_NEEDLE", 2048, NULL, 4, NULL);
-                }
-                else{
-                    //se preciono peor no se completo el pago 
-                    printf("no se ha completado el pago \n barrera cerrada\n");
-                    //tarea que levantara la aguja
-                   
-                }
-                
-            }
-            break;
-
-        case BARRIER_RAISING: {
-
-            printf("Elevando... \n");
-            //barrier_state_machine(current_barrier_state);
-            //return;
-            
-            // if(vehi_pos == pass_vehi){
-            //     //esperamos hastaq ue se precione el boton que indica que esta pasando el vehiculo
-            //     //pero recordando que este proceso puede ser interrumpido
-            //     printf("vehiculo pasadno - elevacion interrumpida");
-            //     current_barrier_state = BARRIER_INTERRUPTED;
-            //     vehicle_waiting = false; 
-            //     return;
-            // }
-            //si termina de salir cambia a BARRIE_UP
-
-            
-
-
-        }break;
-
-        case BARRIER_UP:{
-            if(vehi_pos == pass_vehi){
-                printf("vehiculo ha pasdo - inciando decenso\n");
-                vTaskDelay(2000/portTICK_PERIOD_MS); //esperando
-                
-                vehicle_waiting=false;
-                current_barrier_state= BARRIER_LOWERING;
-                xTaskCreate(lower_needle_task,"LOWER_NEEDLE",2048,NULL,4,NULL);
-            }
-            break;
-        }
-
-
-
-        case BARRIER_LOWERING:{
-
-            printf("Bajando... \n");
-            // if(vehi_pos == pass_vehi){
-            //     printf("nuevo vehiculo detectado - interrumpiedo decenso\n");
-            //     current_barrier_state=BARRIER_INTERRUPTED;
-            //     vehicle_waiting=true;
-
-            // }
-            //si se termina de bajar cambias a BARRIER_WAITING
-        }break;
-
-        case BARRIER_INTERRUPTED:{
-
-            if(vehi_pos == init_vehi && !vehicle_waiting){
-                printf("reanudando elevacion desde interrumpcion\n");
-                vehicle_waiting=true;
-                current_barrier_state=BARRIER_RAISING;
-                xTaskCreate(raise_needle_task,"RAISE_NEEDLE", 2048, NULL, 4, NULL);
-            }
-            else if(vehi_pos == pass_vehi && vehicle_waiting){
-                printf("vehiculo pasndo contnuando decenso\n");
-                vehicle_waiting=false;
-                current_barrier_state=BARRIER_LOWERING;
-                xTaskCreate(lower_needle_task,"LOWER_NEEDLE",2048,NULL,4,NULL);
-            }
-
-        }break;
-
-
-    }
-}
-*/
 
 void barrier_state_machine(int vehi_pos){
 
@@ -666,7 +503,7 @@ void barrier_state_machine(int vehi_pos){
             break;
 
         case BARRIER_RAISING:
-            printf("Elevando\n");
+            printf("elevando\n");
             
       
             if(vehi_pos == pass_vehi){
@@ -691,7 +528,7 @@ void barrier_state_machine(int vehi_pos){
             break;
 
         case BARRIER_LOWERING:
-            printf("Bajando\n");
+            printf("bajando\n");
             
             
             if(vehi_pos == init_vehi && pyment_completed){
@@ -705,7 +542,6 @@ void barrier_state_machine(int vehi_pos){
             break;
 
         case BARRIER_INTERRUPTED:
-            // Este estado se usa como transición, las tareas ya se crean en los casos anteriores
             printf("Estado de interrupción - procesando cambio de direccion\n");
             break;
     }
@@ -750,44 +586,6 @@ void update_needle_leds(state_needle_t needle_state, bool is_raising){
     }
 }
 
-/*
-void raise_needle_task(void *params){
-
-    
-    la seceuncia es DOWN -> MIDDLE -> UP
-
-    pero tiene la codnicion de que esta operacion puede ser interrumpida, en este caso como se encuentra elevando en cualquier momento de los 3 estaods puede ser interrumpido y en este caso la aguja empezara a bajar. 
-
-    para poder lograr esto, necesitamos verificar que la doncicion no se ha interrumpido, se interrumpe cunado se presiona el boton que indica que hay un vehiculo esperando el GPIO 15 << init_vehi >>
-    
-    
-
-    printf("inciando elevacion\n");
-
-    if(current_barrier_state == BARRIER_RAISING && curren_state_needle== STATE_DOWN ){
-        //prendemos el led que indica la posicion abajo
-        //DOWN -> MIDDLE
-
-        curren_state_needle = STATE_MIDDLE;
-        update_needle_leds(STATE_MIDDLE,true);
-        printf("posicion media\n");
-        vTaskDelay(2000/portTICK_PERIOD_MS); //espera 2 segundos
-
-    }
-
-    if(current_barrier_state == BARRIER_RAISING && curren_state_needle==STATE_MIDDLE){
-            //MIDDLE -> UP
-            curren_state_needle = STATE_UP;
-            update_needle_leds(STATE_UP,true);
-            printf("aguja arriba \n");
-            current_barrier_state =  BARRIER_UP; //barrera completamente arriba
-            vTaskDelay(2000/portTICK_PERIOD_MS); //espera 2 segundos 
-    
-    }
-    vTaskDelete(NULL); //elimina tarea
-}*/
-
-//DSPT
 void raise_needle_task(void *params){
     printf("iniciando elevacion desde estado: %d\n", curren_state_needle);
 
@@ -819,36 +617,6 @@ void raise_needle_task(void *params){
     
     vTaskDelete(NULL);
 }
-
-/*
-void lower_needle_task(void *params){
-    
-    printf("iniciando secuencia de decenso\n");
-
-    // UP -> MIDDLE
-    if(current_barrier_state == BARRIER_LOWERING && curren_state_needle== STATE_UP){
-        curren_state_needle= STATE_MIDDLE;
-        update_needle_leds(STATE_MIDDLE,false); //decenso
-        printf("aguja posicion media - LOWER\n");
-        vTaskDelay(2000/portTICK_PERIOD_MS);    
-    }
-
-    if(current_barrier_state == BARRIER_LOWERING && curren_state_needle==STATE_MIDDLE){
-        // MIDDLE -> DOWN
-        curren_state_needle = STATE_DOWN;
-        update_needle_leds(STATE_DOWN,false);
-        printf("aguja posicion BAJO - LOWER\n");
-        pyment_completed=false;
-        vehicle_waiting=false;
-        current_barrier_state= BARRIER_WAITING;
-        vTaskDelay(2000/portTICK_PERIOD_MS);
-
-    }
-
-    
-    vTaskDelete(NULL);
-}
-*/
 
 void lower_needle_task(void *params){
     printf("iniciando descenso desde estado: %d\n", curren_state_needle);

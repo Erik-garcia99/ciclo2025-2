@@ -1,0 +1,52 @@
+
+espectos clases del juego: 
+
+-el carro siempre avanza siempre hacia adelante de froma automatica. el jugador solo puede controlar si va hacia arriba o y si va hacia abajo <esto mediante botones> 
+
+-los obstaculos pueden estan en la aprte de arriba - abajo o en medio del camino, el espacio entre estos obstaculos deberia de ser lo sufiente para que el objeto jugable puede desplazarse entre las diferentes posiciones. 
+
+-la posicion de los objetos es de manera aleatoria
+
+-el juego mostrara el timepo transcurrido tanto en pantalla como en LEDS el de LEDS estara limitado a lo que nos da 5 numeros binarios pero en pantalla puede ser hasta que el usuario quiere interrumpir 
+
+
+######################PRIMERO (considero)
+
+-al parecer no podemos como que el juego se adapte a un ancho de pantalla, lo que podemos hacer es estbalcer un ancho por defecto < intentemos con 80 >
+
+
+
+############### QUE COMUNICACION USAREMOS ENTRE TAREAS
+
+usaremos una combinacion de comunicaciones entre tareas 
+
+-> usaremos colas para manejar las acciones del jugador, dado que una cola es usado para mandr infromacion entre 2 tareas casi directo, 
+
+
+--> puede ser una tarea dedicada a ller los estados de los botones, < arriba, abajo, terminar (si podemos podremos agregar un boton que indique el incio) > ya que se precioone un boton lo mandamos a la cola 
+
+--> tarea consumidoa (task_game_logic): una tarea princapl del jurgo espera que llegue un mensaje de la coal, cunado recibe algo lo lee actualiza la posicion del carro o termina el juego segun corresponda 
+
+--> uso de < evento de grupos >
+
+->una tarea que espera que pase un segundo para incrementar el contador y luego activa un grupo el bit de un grupo de bit como < TIMER_TICK_BIT> -> esto porque no necesitemsoq ue esta este actia todo el tiempo porque el timepo que esta esperando a que legue el bit solo esta consumineto recurso, la ventaja con el evento de grupos es que la tarea se "suspende" no consume recursos hasta que se active el bit que la haga despertar. 
+
+-> tarea para despplegar el contenido en la pantalla y eleds. 
+
+entonces tendremos 4 tareas (por ahora que se me ocurren)
+
+-Una tarea se encarga de la entrada.
+
+-Otra del control del tiempo.
+
+-La tarea principal orquesta la lógica del juego.
+
+-Y una última se encarga de actualizar la pantalla y los LEDs.
+
+<< cada grupo de eventos tiene 24 bits utilizables
+
+###########################LOGICA DEL juego
+
+-> se me ocurre que talvez el carro no es el que se mueve hacia adelante, lo que se mueve hacia el son los objetos, solo seria la ilusion de que algo se etaa moviendo, pero lo que se mueve son los objetos entonces el carro solo tendria que moverse hacia arriba o abajo
+
+
