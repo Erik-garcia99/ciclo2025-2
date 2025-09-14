@@ -16,7 +16,10 @@
     "--compile-commands-dir=${workspaceFolder}\\build"
   ],
   "files.associations": {
-    "ioctl.h": "c"
+    "ioctl.h": "c",
+    "string.h": "c",
+    "_ansi.h": "c",
+    "freertos.h": "c"
   },
   "idf.flashType": "UART",
   "idf.portWin": "COM3"

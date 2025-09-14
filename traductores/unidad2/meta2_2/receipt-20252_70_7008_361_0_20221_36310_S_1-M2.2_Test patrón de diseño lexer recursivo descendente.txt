@@ -1,0 +1,7 @@
+Your submission was successful!
+Course: 20252_70_7008_361_0_20221_36310_S_1, Traductores(361)
+Assessment: M2.2_Test patrón de diseño lexer recursivo descendente
+
+Submission date: 9/11/25, 11:59 PM
+Submitter: ERIK GARCÍA CHÁVEZ
+Confirmation number: 5b50826e9b364f1e9e5acf43acd83f94

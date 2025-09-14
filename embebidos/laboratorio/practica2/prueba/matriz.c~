@@ -1,0 +1,14 @@
+#include <stdio.h>
+
+int main() {
+    int matriz[2][3] = {{1, 2, 3}, {4, 5, 6}};
+    
+    printf("Recorriendo la matriz:\n");
+    for(int fila = 0; fila < 2; fila++) {        // Filas
+        for(int col = 0; col < 3; col++) {       // Columnas
+            printf("matriz[%d][%d] = %d\n", fila, col, matriz[fila][col]);
+        }
+    }
+    
+    return 0;
+}

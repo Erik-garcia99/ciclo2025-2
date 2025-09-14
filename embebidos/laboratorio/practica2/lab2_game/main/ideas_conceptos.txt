@@ -12,7 +12,9 @@ espectos clases del juego:
 
 ######################PRIMERO (considero)
 
--al parecer no podemos como que el juego se adapte a un ancho de pantalla, lo que podemos hacer es estbalcer un ancho por defecto < intentemos con 80 >
+-al parecer no podemos como que el juego se adapte a un ancho de pantalla, lo que podemos hacer es estbalcer un ancho por defecto < intentemos con 80 > ((OK))
+
+-ahora necesitamos saber como represetnares el vehiculo y obstaclos 
 
 
 
@@ -23,7 +25,7 @@ usaremos una combinacion de comunicaciones entre tareas
 -> usaremos colas para manejar las acciones del jugador, dado que una cola es usado para mandr infromacion entre 2 tareas casi directo, 
 
 
---> puede ser una tarea dedicada a ller los estados de los botones, < arriba, abajo, terminar (si podemos podremos agregar un boton que indique el incio) > ya que se precioone un boton lo mandamos a la cola 
+--> puede ser una tarea dedicada a leer los estados de los botones, < arriba, abajo, terminar (si podemos podremos agregar un boton que indique el incio) > ya que se precioone un boton lo mandamos a la cola 
 
 --> tarea consumidoa (task_game_logic): una tarea princapl del jurgo espera que llegue un mensaje de la coal, cunado recibe algo lo lee actualiza la posicion del carro o termina el juego segun corresponda 
 
@@ -47,6 +49,56 @@ entonces tendremos 4 tareas (por ahora que se me ocurren)
 
 ###########################LOGICA DEL juego
 
--> se me ocurre que talvez el carro no es el que se mueve hacia adelante, lo que se mueve hacia el son los objetos, solo seria la ilusion de que algo se etaa moviendo, pero lo que se mueve son los objetos entonces el carro solo tendria que moverse hacia arriba o abajo
+-> el vehiculo se va a estar moviendo, los obstaculos se mantienen quietos, lo que va a pasar cunado el vehiculo llegue al final del frame deberia de generar nuevos obstatuclos de manera. entonces esto seria constantemnete verificar si llego lo cual seria una tarea que estuviera durmiento solo la activamos cunado se llega al borde < grupo de eventos > 
+    -> cunado llegue al funal del lienzo debe de volverlo al inicio y volver a generar nuevos obstaculos. 
+    -> el tiempo tiene que seguir contando. 
 
+
+
+############################TAREA EN PROCESO 
+
+-> antes que nada debemos de establecer una tarea que es la que estara controlando el proceso de la animacion del juego, 
+    pero creo que representariamos con un caracter el objeto jugable y el obstatuclos, para un manejo mas rapido y mas simple.
+
+    entonces necesitamos < tarea que controla que la animacion del juego >  -> esta y la 3era son la misma 
+
+-> tarea que lee de la funcion de ISR que boton es el que se preciono y mandar por una cola a la tarea pincipal de la tarea que es la que 
+    es la que tenemos abajo << DESARROLLAR TAREA PRIEMRO >> <<OK -> FALTA LA FUNCION PRINCOPAL QUE RECIBE EL BOTON PRECIONADO
+
+-> esta misma tarea necesita recibir infromacion sobre si se envia hacia arriba o hacia abajo
+    << esta tarea deberia de activar un grupo de evento que avisa que si toca un obstatulo este pierde >>
+
+xxxxxxxxxxxxxxxxxxxxxxxxxx
+-> GENREACION DE OBSTUCILOS EN UN INICIO 
+    -> se debe de generar una primera impresion de los obstaculos, los cuales estsaran quietos, en todos los frames, cunado el vehiculo llegue al final de la "pantalla" volvera a genrear nuevos ibtaculos
+        # por ahora lo que esta psadno es que si genrea los obstaculos pero los genera muy pegaditos en los 3 carrilos lo cual no es lo correcto. deberiamos a implementar algo para que aparezca si aaprece uno arriba que abajo no aparezca si no hasta 5 a 6 posiocnes adelante o atras.
+        
+        #nuestro vehiculo aparecera en el indice 5 de lo ancho y nuestros iobjetos deben de aparece en el 15
+
+xxxxxxxxxxxxxxxxxxxxxxxx
+
+
+-> ####tarea pincipal
+
+    -> funciones que necesitamos: 
+        necesitamos una funcion que es la que estara constatemente mostrando en pantalla el juego. 
+
+#############ejemplo -> tenemos en la carpeta de << prueba >> un codigo de ejemplo de como podria ser el juego 
+
+
+-> POSICION DE LPS OBSTAUCLOS 
+
+    -> creo que lo mas adecuado seria poner solo 1 caracter por ahora, en donde debemos de poner en un arreglo de un tamanio de igual que el ancho de la pantalla y con numeros random decidir en donde poner X obstaculo igual que se sobreescriban pero con la coindicion de que deberian de estar en X posicion entre uno a otros tanto de ancho como de alto (debe de ser una matriz de igual tamanio de la pantalla)
+
+##################################ERROR MUY IMPORTANTE 
+lo que esta pasnado es que esoty intetnado insertar datos en la matriz s obstacule en direccion que no existen 
+
+lo que puedo hacer es en efecto ingresar como tal los numeros pero seran repesetnacivos no seria exactamanete la direccion que ingresare
+
+con codnicionales dbereia de poner 
+
+if(obstacule[0][x]==1) canvas[LANE_TOP][x] = X;, algo asi padre en canva se llevara a cabo todo el proceso de dibujar los obstculos y el vehiculo, por eso es uq eme estaba fallando queria hacer lo mismo en el obstacule y canvas, pero no, obstacule solo sera como representativo canvas es el bueno que los dibuja, por lo que debo de cambiar esas funciones para trabajr solo con las 3 filas 
+
+
+################################
 
