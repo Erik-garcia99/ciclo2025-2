@@ -7,8 +7,11 @@
 // #define TX_PIN 17
 // #define RX_PIN 16
 
-#define TX_PIN 18
-#define RX_PIN 19
+#define TX_PIN 4   // GPIO4 - sin funciones especiales
+#define RX_PIN 2 
+
+// #define TX_PIN 18
+// #define RX_PIN 19
 
 #define MAX_INPUT 25
 #define BUF_SIZE 1024
