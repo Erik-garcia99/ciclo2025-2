@@ -90,15 +90,39 @@ xxxxxxxxxxxxxxxxxxxxxxxx
 
     -> creo que lo mas adecuado seria poner solo 1 caracter por ahora, en donde debemos de poner en un arreglo de un tamanio de igual que el ancho de la pantalla y con numeros random decidir en donde poner X obstaculo igual que se sobreescriban pero con la coindicion de que deberian de estar en X posicion entre uno a otros tanto de ancho como de alto (debe de ser una matriz de igual tamanio de la pantalla)
 
-##################################ERROR MUY IMPORTANTE 
-lo que esta pasnado es que esoty intetnado insertar datos en la matriz s obstacule en direccion que no existen 
 
-lo que puedo hacer es en efecto ingresar como tal los numeros pero seran repesetnacivos no seria exactamanete la direccion que ingresare
+################################NOTAs
 
-con codnicionales dbereia de poner 
-
-if(obstacule[0][x]==1) canvas[LANE_TOP][x] = X;, algo asi padre en canva se llevara a cabo todo el proceso de dibujar los obstculos y el vehiculo, por eso es uq eme estaba fallando queria hacer lo mismo en el obstacule y canvas, pero no, obstacule solo sera como representativo canvas es el bueno que los dibuja, por lo que debo de cambiar esas funciones para trabajr solo con las 3 filas 
+***************** -> esta bien pero lo que pasa es que como lo estoy viendo se ve muy juntos pero cumple con mis codnicionales
 
 
-################################
+- EL MAPA YA muetsra algo mas decente, pero aun siguen apareciendo los obstaculos algo cerca, muy cercas, por lo que es necesario pulir ese aspecto
 
+-necesitamos una forma para que se mantenga el mismo patron hasta que el vehiculo cruce el limite entonces volver a cmabiar los obstaculos por lo que poderia ser una codnicion y una varibale que me inique eso, cunado cruce entra a la condicion llama a la funcion para actualiazar los obstaculos 
+******************************
+
+
+lo que falta es < funcion que cehce coliciones > < funcion o ciclo que haga que avance el vehiculo > 
+
+<funcion con el grupo de eventos para el paso del tiempo >
+
+
+//aqui mostraremos nuestro vehiculo tambein, que no, pero ahora como, pero despues lo cambiaremos para ver como le hacemos para que el vehiculo se hacerca o los obstaculos se acerquen, cualquiera funciona mi pa. creo que mejor el vehiculo para que estos se queden estaticos
+
+entonce snecesitmaos una funcion que haga que nuestro vehiculo avanzara 
+
+##################################JUEGO TERMINADO 
+
+la logica del juego ya termino, nomas que ne fisico se me anda pondinedo pendejos los botones pero llegnado los aliviaodn
+
+
+###########################FALTA 
+
+- la salida por GPIO del tiempo 
+
+-el conteo de los segundos en la pantalla < este lo haremos por un grupo de eventos, esta tarea no es necesario que este activa siempre > 
+
+
+#######FUNCION DE PASO DE TIEMPO 
+
+-> se que tiene que ser un evento, porque solo se acvitara cunado pase 1 segundo
