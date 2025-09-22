@@ -35,7 +35,7 @@ static uint64_t LAST_PRESS_INIT_ = 0; //aunque este solo se precionara 1 vez en 
 static uint64_t LAST_PRESS_FINISH_ = 0;
 
 volatile int current_line = 1; //la direccion en donde estara
-static int game_speed = 100; //VELOCIDAD del juego 
+static int game_speed = 70; //VELOCIDAD del juego 
 static int vehicle_x = SPAWN_OBJ; //donde aparecera en un inicio
 
 //volatile int current_line=1; //estabelcemos que 0 - arriba - 1 -centro y 2 - abajo  <pero debemos de establecer alguna condicionan en donde por quejemplo si le da varias veces al arriba o abajo no ceremente mas de lo que deberia si no que se quede donde mismo. >, el voaltin porque su valor va a estar cambiando entonces C no lo optimiza. 
@@ -226,8 +226,8 @@ void IRAM_ATTR gpio_isr_handler(void *args){
                 portYIELD_FROM_ISR();
               }
             }
-          }break;
-  }
+        }break;
+    }
 }
 
 
@@ -332,8 +332,7 @@ void task_game_main(void *params){
             move_vehicle();
 
             if(check_collision()){
-                printf("\n\n=== ¡COLISIÓN! GAME OVER ===\n");
-                printf("Posición del choque: X=%d, Línea=%d\n", vehicle_x, current_line);
+                printf("\n\n=== ¡suerte a la proxima===\n");
                 game_over = true;
             }
                     

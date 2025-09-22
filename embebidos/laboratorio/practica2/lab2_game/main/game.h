@@ -17,7 +17,7 @@
 #define _LED5_ 25
 
 //macros que nos ayudaran a controlar el antirebote de los botones 
-#define DEBOUNCE_TIME 20000 
+#define DEBOUNCE_TIME 200000 
 #define WIDTH_SCRE 50
 #define HEIGTH_SCRE 10 //el alto de la "pantalla" del juego, esto para fromar un vector para poder representar le juego 
 
@@ -73,6 +73,8 @@ int check_collision(void);
 void delimiter(void);
 void init_matrices(void);
 
+//################################
+// void debug_stats_task(void *params);
 
 
 #endif

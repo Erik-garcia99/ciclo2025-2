@@ -6,6 +6,23 @@
 #include<driver/gpio.h>
 #include<driver/uart.h>
 
+
+/*
+esta actividad era de que recibe por UART 
+-primero un numero que es el que representa el numero del arreglo
+-despues va ingresando los datos hasta n-1
+-despues de eso pasamos a ordenar
+    -primero se ordena de manera asendente, de menor a mayor
+    -despues si hay numeros repetidos sustituirlos con el -1
+-imrpimroos los valores con sus valores binarios que seran desplegados por GPIO en 8 leds 
+-> no imprimir los -1. 
+*/
+
+
+
+
+
+
 //definiciones 
 
 #define BUFFER 1024
@@ -17,6 +34,9 @@ void UART_DEFINE();
 //tarea principal;
 void UART_ARRAY(void *parms);
 
+//funcion que ordena el arreglo
+void quick_uart(int *vector); //pasamos por apintador
+void detale_dup(int *vector); //con esta funcion eliminaremos los duplicados del vector, una vez que ya este ordenado
 
 //varibales globales 
 //tag 
@@ -68,6 +88,19 @@ void UART_DEFINE(){
 
 
 void UART_ARRAY(void *parms){
+
+
+}
+
+
+void quick_uart(int *vector){
+
+    //esta funcion ya le pasaremos el vector con todos los datos crudos 
+    
+
+
+
+
 
 
 }
