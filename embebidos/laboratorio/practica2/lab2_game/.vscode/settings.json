@@ -22,5 +22,7 @@
     "freertos.h": "c"
   },
   "idf.flashType": "UART",
-  "idf.portWin": "COM3"
+  "idf.portWin": "COM3",
+  "vscode-pets.theme": "winter",
+  "vscode-pets.petType": "chicken"
 }

@@ -1,0 +1,2 @@
+-> primer tema que vimos asi bueno del ESP son los GPIO (ya hasta ando
+fallando aqui)
