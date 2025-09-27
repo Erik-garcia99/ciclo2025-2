@@ -236,95 +236,35 @@ void type_intr(void){
 
 }
 
-//gardamos la funcion en RAM para que el proceso de ingresar sea mucho mas rapido
-void IRAM_ATTR gpio_isr_handler(void *args){    
-  uint32_t pin_number = (uint32_t)args;
-  uint64_t current_time = esp_timer_get_time();
 
-  switch(pin_number) {
-        case _UP_:{
-            if((current_time - LAST_PRESS_UP_)> DEBOUNCE_TIME){
-                LAST_PRESS_UP_ = current_time;
-                xQueueSendFromISR(handlerQueue, &pin_number,NULL);
-            }
-        }break;
-        case _DOWN_:{
-
-            if((current_time - LAST_PRESS_DOWN_) > DEBOUNCE_TIME){
-                LAST_PRESS_DOWN_ = current_time;
-                xQueueSendFromISR(handlerQueue, &pin_number,NULL);
-            }
-
-        }break;
-        case _FINISH_:{
-
-            if((current_time - LAST_PRESS_FINISH_) > DEBOUNCE_TIME){
-                LAST_PRESS_FINISH_ = current_time;
-                xQueueSendFromISR(handlerQueue, &pin_number,NULL);
-            }
-        //   if ((current_time - (pin_number == _UP_ ? LAST_PRESS_UP_ : (pin_number == _DOWN_ ? LAST_PRESS_DOWN_ : LAST_PRESS_FINISH_))) > DEBOUNCE_TIME) {
-        //       if(pin_number == _UP_) LAST_PRESS_UP_ = current_time;
-        //       else if(pin_number == _DOWN_) LAST_PRESS_DOWN_ = current_time;
-        //       else LAST_PRESS_FINISH_ = current_time;
-        //       xQueueSendFromISR(handlerQueue, &pin_number, NULL);
-        }break;
-        case _INIT_:
-          if ((current_time - LAST_PRESS_INIT_) > DEBOUNCE_TIME) {
-            LAST_PRESS_INIT_ = current_time;
-            if (inicio == false) {
-              inicio = true;
-              BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-              xEventGroupSetBitsFromISR(event_group, ready, &xHigherPriorityTaskWoken);
-                    
-              // También enviamos a la cola para que aparezca el mensaje de depuración
-              xQueueSendFromISR(handlerQueue, &pin_number, NULL);
-
-              if (xHigherPriorityTaskWoken) {
-                portYIELD_FROM_ISR();
-              }
-            }
-        }break;
-    }
-}
-
-
-
-// // ISR sin printf - solo guardar información
 // void IRAM_ATTR gpio_isr_handler(void *args){    
 //     uint32_t pin_number = (uint32_t)args;
 //     uint64_t current_time = esp_timer_get_time();
     
-//     // Guardar información de debug sin printf
-//     debug_last_pin = pin_number;
-//     debug_pin_state = gpio_get_level(pin_number);
-
+  
 //     switch(pin_number) {
-//         case _UP_:{
-//             debug_isr_count_up++;
+//         case _UP_:
 //             if((current_time - LAST_PRESS_UP_) > DEBOUNCE_TIME){
 //                 LAST_PRESS_UP_ = current_time;
 //                 xQueueSendFromISR(handlerQueue, &pin_number, NULL);
 //             }
-//         }break;
-        
-//         case _DOWN_:{
-//             debug_isr_count_down++;
+//             break;
+            
+//         case _DOWN_:
 //             if((current_time - LAST_PRESS_DOWN_) > DEBOUNCE_TIME){
 //                 LAST_PRESS_DOWN_ = current_time;
 //                 xQueueSendFromISR(handlerQueue, &pin_number, NULL);
 //             }
-//         }break;
-        
-//         case _FINISH_:{
-//             debug_isr_count_finish++;
+//             break;
+            
+//         case _FINISH_:
 //             if((current_time - LAST_PRESS_FINISH_) > DEBOUNCE_TIME){
 //                 LAST_PRESS_FINISH_ = current_time;
 //                 xQueueSendFromISR(handlerQueue, &pin_number, NULL);
 //             }
-//         }break;
-        
-//         case _INIT_:{
-//             debug_isr_count_init++;
+//             break;
+            
+//         case _INIT_:
 //             if ((current_time - LAST_PRESS_INIT_) > DEBOUNCE_TIME) {
 //                 LAST_PRESS_INIT_ = current_time;
 //                 if (inicio == false) {
@@ -337,10 +277,60 @@ void IRAM_ATTR gpio_isr_handler(void *args){
 //                     }
 //                 }
 //             }
-//         }break;
+//             break;
 //     }
 // }
 
+void IRAM_ATTR gpio_isr_handler(void *args){    
+  uint32_t pin_number = (uint32_t)args;
+  uint64_t current_time = esp_timer_get_time();
+  
+  switch(pin_number) {
+        case _UP_:{
+            if((current_time - LAST_PRESS_UP_) > DEBOUNCE_TIME){
+
+                if(gpio_get_level(pin_number) == 0){ 
+                    LAST_PRESS_UP_ = current_time;
+                    xQueueSendFromISR(handlerQueue, &pin_number, NULL);
+                }
+            }
+        }break;
+
+        case _DOWN_:{
+            if((current_time - LAST_PRESS_DOWN_) > DEBOUNCE_TIME){
+                if(gpio_get_level(pin_number) == 0){
+                    LAST_PRESS_DOWN_ = current_time;
+                    xQueueSendFromISR(handlerQueue, &pin_number, NULL);
+                }
+            }
+        }break;
+
+        case _FINISH_:{
+            if((current_time - LAST_PRESS_FINISH_) > DEBOUNCE_TIME){
+                if(gpio_get_level(pin_number) == 0){
+                    LAST_PRESS_FINISH_ = current_time;
+                    xQueueSendFromISR(handlerQueue, &pin_number, NULL);
+                }
+            }
+        }break;
+
+        case _INIT_:
+          if ((current_time - LAST_PRESS_INIT_) > DEBOUNCE_TIME) {
+            if(gpio_get_level(pin_number) == 0){
+                LAST_PRESS_INIT_ = current_time;
+                if (inicio == false) {
+                    inicio = true;
+                    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+                    xEventGroupSetBitsFromISR(event_group, ready, &xHigherPriorityTaskWoken);
+                    xQueueSendFromISR(handlerQueue, &pin_number, NULL);
+                    if (xHigherPriorityTaskWoken) {
+                        portYIELD_FROM_ISR();
+                    }
+                }
+            }
+        }break;
+    }
+}
 
 
 
@@ -432,25 +422,25 @@ void task_game_main(void *params){
             switch(step){
 
                         //de esta manera nos aseugramos que no reste o sume mas de lo que deberia porque estara saliendo de las lineas del juego 
-            case _UP_:{
-                if(current_line > 0){
-                current_line--;
+                case _UP_:{
+                    if(current_line > 0){
+                    current_line--;
                                 
-                }
-            }break;
+                    }
+                }break;
 
-            case _DOWN_:{
-                if(current_line < 2){
-                current_line++;
+                case _DOWN_:{
+                    if(current_line < 2){
+                    current_line++;
                                 
-                }
-            }break;
+                    }
+                }break;
 
-            case _FINISH_:{
-                printf("\n\n=== HASTA LUEGO ===\n");
-                game_over =true;
-                break;
-            }
+                case _FINISH_:{
+                    printf("\n\n=== HASTA LUEGO ===\n");
+                    game_over =true;
+                    break;
+                }
 
             }   
         }
@@ -656,17 +646,7 @@ void update_lanes(){
 //funcion terminadas
 void display_games(void){
 
-    // printf("\033[2J\033[H"); // Limpiar terminal
-    // delimiter();
-
-    static bool first_display = true;
-    
-    if(first_display) {
-        printf("\033[2J\033[H"); // Solo limpiar completamente la primera vez
-        first_display = false;
-    } else {
-        printf("\033[H"); // Solo mover cursor al inicio, no limpiar
-    }
+    printf("\033[2J\033[H");
 
 
     for(int y= 0; y < HEIGTH_SCRE; y++){

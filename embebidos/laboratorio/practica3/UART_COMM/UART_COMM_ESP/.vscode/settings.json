@@ -18,6 +18,6 @@
   "files.associations": {
     "uart_com_esp.h": "c"
   },
-  "idf.portWin": "COM8",
+  "idf.portWin": "COM3",
   "idf.flashType": "UART"
 }

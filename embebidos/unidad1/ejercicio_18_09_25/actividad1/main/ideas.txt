@@ -1,0 +1,14 @@
+
+-> necesitaremos una tarea que es la que estara
+
+
+-> el ordenamineto del arreglo es ordeanmeinto por insersion
+
+funcion memset, memset(void *str, int c, size_t n) -> copia el caracter C a los priemros n caracteres de
+
+//atoi convierte una cadena en su representacion entera. 
+
+
+para mandarle los datos correcto
+
+
