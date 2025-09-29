@@ -1,0 +1,8 @@
+Your submission was successful!
+Course: 20252_70_7008_361_0_20221_36310_S_1, Traductores(361)
+Assessment: M3.2_Ejemplo analizador sintáctico LL(k)
+
+Submission date: 9/28/25, 8:51 PM (PDT)
+Submission size: 108.5 KB
+Submitter: ERIK GARCÍA CHÁVEZ
+Confirmation number: 12cc5aa18c2f48e28186777a437452d7

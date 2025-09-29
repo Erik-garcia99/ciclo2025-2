@@ -1,15 +1,12 @@
 inicio-programa
-    variables: numeroDeElementos, promedio, i, elemento
-
+    variables : numeroDeElementos, promedio, i, elemento
     leer numeroDeElementos
     promedio = 0
-    i=0
-
-    mientras (i < numeroDeElementos)
+    
+    repite (i, 1, numeroDeElementos)
         leer elemento
         promedio = promedio + elemento
-        i = i + 1
-    fin-mientras
+    fin-repite
 
     promedio = promedio / numeroDeElementos
     escribir "El promedio es ", promedio

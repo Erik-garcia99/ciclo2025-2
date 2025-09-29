@@ -6,7 +6,7 @@
 #include<ctype.h>
 #include "esp_log.h"
 
-// #include "uart_com_esp.h"
+
 
 
 
@@ -290,20 +290,20 @@ void task_banner(void *params){
 
         // Esperar con timeout pero sin mostrar mensaje cada vez
         int rx_bytes = uart_read_bytes(UART_ESP_COMM, data, MAX_INPUT, pdMS_TO_TICKS(1000));
-	//en esta parate la debemos de comentar 
-	/*
+
         if(rx_bytes > 0){
             data[rx_bytes] = '\0';
             ESP_LOGI(TAG, "¡DATOS RECIBIDOS! Bytes: %d, Contenido: '%s'", rx_bytes, (char*)data);
             
-            // Mostrar datos en hexadecimal para debug
+            /*
             char hex_str[256] = {0};
             for(int i = 0; i < rx_bytes && i < 16; i++) {
                 sprintf(hex_str + strlen(hex_str), "%02X ", data[i]);
-            }
-            ESP_LOGI(TAG, "Datos en HEX: %s", hex_str);*/
+            }*/
 
-            // Validar que los datos son texto válido
+
+           // ESP_LOGI(TAG, "Datos en HEX: %s", hex_str);
+
             bool valid_data = true;
             for(int i = 0; i < rx_bytes; i++){
                 if(data[i] < 32 && data[i] != 0) { // Caracteres no imprimibles (excepto NULL)
@@ -319,7 +319,6 @@ void task_banner(void *params){
                 for(int line = 0; line < HEIGHT; line++){
                     for(int i = 0; i < rx_bytes; i++){
                         const asciiChar* c = find_char(data[i]);
-                        
                         if(c){
                             uart_write_bytes(UART_USER, c->lines[line], strlen(c->lines[line]));
                             uart_write_bytes(UART_USER, " ", 1);

@@ -35,7 +35,7 @@ static uint64_t LAST_PRESS_INIT_ = 0; //aunque este solo se precionara 1 vez en 
 static uint64_t LAST_PRESS_FINISH_ = 0;
 
 volatile int current_line = 1; //la direccion en donde estara
-static int game_speed = 70; //VELOCIDAD del juego 
+static int game_speed = 50; //VELOCIDAD del juego 
 static int vehicle_x = SPAWN_OBJ; //donde aparecera en un inicio
 
 //volatile int current_line=1; //estabelcemos que 0 - arriba - 1 -centro y 2 - abajo  <pero debemos de establecer alguna condicionan en donde por quejemplo si le da varias veces al arriba o abajo no ceremente mas de lo que deberia si no que se quede donde mismo. >, el voaltin porque su valor va a estar cambiando entonces C no lo optimiza. 
@@ -65,6 +65,27 @@ const int seg = BIT1; // segun yo este sera para cunado pase 1 segundo,
 
 volatile uint32_t elapsed_seconds = 0; // varibale global para el timepo 
 volatile uint64_t last_update_time = 0;
+
+//#############################################
+// volatile uint32_t debug_isr_count_up = 0;
+// volatile uint32_t debug_isr_count_down = 0;
+// volatile uint32_t debug_isr_count_init = 0;
+// volatile uint32_t debug_isr_count_finish = 0;
+// volatile uint32_t debug_last_pin = 0;
+// volatile uint32_t debug_pin_state = 0;
+
+
+// void reset_debug_counters(void){
+//     debug_isr_count_up = 0;
+//     debug_isr_count_down = 0;
+//     debug_isr_count_init = 0;
+//     debug_isr_count_finish = 0;
+// }
+
+
+//###########################################
+
+
 
 
 void app_main(void)
@@ -97,10 +118,12 @@ void app_main(void)
     xTaskCreate(task_input,"task_input",2048,NULL,10,NULL);
     xTaskCreate(task_game_main,"task_main",4096,NULL,9,NULL); //asigmaos un poco mas de espacio por que vamos a llamar a funciones para que no todo este dentro de ahi
 
-        //tarea de cotrol de timepo 
+    //tarea de cotrol de timepo 
 
     xTaskCreate(task_timer,"task_timer",2048,NULL,8,NULL);
     xTaskCreate(task_timer_gpio,"task_timer_gpio",2048,NULL,7,NULL);
+
+    //xTaskCreate(debug_stats_task, "task",2048,NULL,8,NULL);
         //minitarea que se encarga de inicar el juego 
         //xTaskCreate(task_init_game,"task_init_game",2048,NULL,5,NULL);
     delimiter();
@@ -139,18 +162,30 @@ void init_gpio(void){
 
     //para leer el boton usaremos la misma funcion y las mismas macros, funcion y mejor ni le movamos
 
-    gpio_pullup_dis(_UP_);
-    gpio_pulldown_en(_UP_);
+    // gpio_pullup_dis(_UP_);
+    // gpio_pulldown_en(_UP_);
 
-    gpio_pullup_dis(_DOWN_);
-    gpio_pulldown_en(_DOWN_);
+    // gpio_pullup_dis(_DOWN_);
+    // gpio_pulldown_en(_DOWN_);
 
-    gpio_pullup_dis(_INIT_);
-    gpio_pulldown_en(_INIT_);
+    // gpio_pullup_dis(_INIT_);
+    // gpio_pulldown_en(_INIT_);
 
-    gpio_pullup_dis(_FINISH_);
-    gpio_pulldown_en(_FINISH_);
+    // gpio_pullup_dis(_FINISH_);
+    // gpio_pulldown_en(_FINISH_);
 
+
+    gpio_pullup_en(_UP_);
+    gpio_pulldown_dis(_UP_);
+    
+    gpio_pullup_en(_DOWN_);
+    gpio_pulldown_dis(_DOWN_);
+    
+    gpio_pullup_en(_INIT_);
+    gpio_pulldown_dis(_INIT_);
+    
+    gpio_pullup_en(_FINISH_);
+    gpio_pulldown_dis(_FINISH_);
     
 
     //seteamos los leds en 0
@@ -170,10 +205,15 @@ void init_gpio(void){
 void type_intr(void){
 
     //indicamos que la interrupcion sera cunado detecte un flanco asendente 
-    gpio_set_intr_type(_UP_, GPIO_INTR_POSEDGE);
-    gpio_set_intr_type(_DOWN_, GPIO_INTR_POSEDGE);
-    gpio_set_intr_type(_INIT_,GPIO_INTR_POSEDGE);
-    gpio_set_intr_type(_FINISH_,GPIO_INTR_POSEDGE);
+    // gpio_set_intr_type(_UP_, GPIO_INTR_POSEDGE);
+    // gpio_set_intr_type(_DOWN_, GPIO_INTR_POSEDGE);
+    // gpio_set_intr_type(_INIT_,GPIO_INTR_POSEDGE);
+    // gpio_set_intr_type(_FINISH_,GPIO_INTR_POSEDGE);
+
+    gpio_set_intr_type(_UP_, GPIO_INTR_NEGEDGE);
+    gpio_set_intr_type(_DOWN_, GPIO_INTR_NEGEDGE);
+    gpio_set_intr_type(_INIT_, GPIO_INTR_NEGEDGE);
+    gpio_set_intr_type(_FINISH_, GPIO_INTR_NEGEDGE);
 
     //instalamos el servico de interrupciones 
     /*
@@ -196,35 +236,97 @@ void type_intr(void){
 
 }
 
-//gardamos la funcion en RAM para que el proceso de ingresar sea mucho mas rapido
+
+// void IRAM_ATTR gpio_isr_handler(void *args){    
+//     uint32_t pin_number = (uint32_t)args;
+//     uint64_t current_time = esp_timer_get_time();
+    
+  
+//     switch(pin_number) {
+//         case _UP_:
+//             if((current_time - LAST_PRESS_UP_) > DEBOUNCE_TIME){
+//                 LAST_PRESS_UP_ = current_time;
+//                 xQueueSendFromISR(handlerQueue, &pin_number, NULL);
+//             }
+//             break;
+            
+//         case _DOWN_:
+//             if((current_time - LAST_PRESS_DOWN_) > DEBOUNCE_TIME){
+//                 LAST_PRESS_DOWN_ = current_time;
+//                 xQueueSendFromISR(handlerQueue, &pin_number, NULL);
+//             }
+//             break;
+            
+//         case _FINISH_:
+//             if((current_time - LAST_PRESS_FINISH_) > DEBOUNCE_TIME){
+//                 LAST_PRESS_FINISH_ = current_time;
+//                 xQueueSendFromISR(handlerQueue, &pin_number, NULL);
+//             }
+//             break;
+            
+//         case _INIT_:
+//             if ((current_time - LAST_PRESS_INIT_) > DEBOUNCE_TIME) {
+//                 LAST_PRESS_INIT_ = current_time;
+//                 if (inicio == false) {
+//                     inicio = true;
+//                     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+//                     xEventGroupSetBitsFromISR(event_group, ready, &xHigherPriorityTaskWoken);
+//                     xQueueSendFromISR(handlerQueue, &pin_number, NULL);
+//                     if (xHigherPriorityTaskWoken) {
+//                         portYIELD_FROM_ISR();
+//                     }
+//                 }
+//             }
+//             break;
+//     }
+// }
+
 void IRAM_ATTR gpio_isr_handler(void *args){    
   uint32_t pin_number = (uint32_t)args;
   uint64_t current_time = esp_timer_get_time();
-
+  
   switch(pin_number) {
-        case _UP_:
-        case _DOWN_:
-        case _FINISH_:
-          if ((current_time - (pin_number == _UP_ ? LAST_PRESS_UP_ : (pin_number == _DOWN_ ? LAST_PRESS_DOWN_ : LAST_PRESS_FINISH_))) > DEBOUNCE_TIME) {
-              if(pin_number == _UP_) LAST_PRESS_UP_ = current_time;
-              else if(pin_number == _DOWN_) LAST_PRESS_DOWN_ = current_time;
-              else LAST_PRESS_FINISH_ = current_time;
-              xQueueSendFromISR(handlerQueue, &pin_number, NULL);
-          }break;
+        case _UP_:{
+            if((current_time - LAST_PRESS_UP_) > DEBOUNCE_TIME){
+
+                if(gpio_get_level(pin_number) == 0){ 
+                    LAST_PRESS_UP_ = current_time;
+                    xQueueSendFromISR(handlerQueue, &pin_number, NULL);
+                }
+            }
+        }break;
+
+        case _DOWN_:{
+            if((current_time - LAST_PRESS_DOWN_) > DEBOUNCE_TIME){
+                if(gpio_get_level(pin_number) == 0){
+                    LAST_PRESS_DOWN_ = current_time;
+                    xQueueSendFromISR(handlerQueue, &pin_number, NULL);
+                }
+            }
+        }break;
+
+        case _FINISH_:{
+            if((current_time - LAST_PRESS_FINISH_) > DEBOUNCE_TIME){
+                if(gpio_get_level(pin_number) == 0){
+                    LAST_PRESS_FINISH_ = current_time;
+                    xQueueSendFromISR(handlerQueue, &pin_number, NULL);
+                }
+            }
+        }break;
+
         case _INIT_:
           if ((current_time - LAST_PRESS_INIT_) > DEBOUNCE_TIME) {
-            LAST_PRESS_INIT_ = current_time;
-            if (inicio == false) {
-              inicio = true;
-              BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-              xEventGroupSetBitsFromISR(event_group, ready, &xHigherPriorityTaskWoken);
-                    
-              // También enviamos a la cola para que aparezca el mensaje de depuración
-              xQueueSendFromISR(handlerQueue, &pin_number, NULL);
-
-              if (xHigherPriorityTaskWoken) {
-                portYIELD_FROM_ISR();
-              }
+            if(gpio_get_level(pin_number) == 0){
+                LAST_PRESS_INIT_ = current_time;
+                if (inicio == false) {
+                    inicio = true;
+                    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+                    xEventGroupSetBitsFromISR(event_group, ready, &xHigherPriorityTaskWoken);
+                    xQueueSendFromISR(handlerQueue, &pin_number, NULL);
+                    if (xHigherPriorityTaskWoken) {
+                        portYIELD_FROM_ISR();
+                    }
+                }
             }
         }break;
     }
@@ -252,6 +354,27 @@ void task_input(void *params){
   }
 
 }
+
+// void task_input(void *params){
+//     int pin_number;
+
+//     while(true){
+//         if(xQueueReceive(handlerQueue, &pin_number, portMAX_DELAY)){
+            
+//             // Debug seguro fuera de ISR
+//             printf("Recibido pin: %d, estado actual: %d\n", pin_number, gpio_get_level(pin_number));
+            
+//             if (pin_number != _INIT_) {
+//                 if(xQueueSend(moveObjectQueue, &pin_number, pdMS_TO_TICKS(10)) == pdTRUE) {
+//                     printf("Pin %d enviado a juego correctamente\n", pin_number);
+//                 } else {
+//                     printf("ERROR: No se pudo enviar pin %d a juego\n", pin_number);
+//                 }
+//             }
+//         }   
+//     }
+// }
+
 
 
 
@@ -299,25 +422,25 @@ void task_game_main(void *params){
             switch(step){
 
                         //de esta manera nos aseugramos que no reste o sume mas de lo que deberia porque estara saliendo de las lineas del juego 
-            case _UP_:{
-                if(current_line > 0){
-                current_line--;
+                case _UP_:{
+                    if(current_line > 0){
+                    current_line--;
                                 
-                }
-            }break;
+                    }
+                }break;
 
-            case _DOWN_:{
-                if(current_line < 2){
-                current_line++;
+                case _DOWN_:{
+                    if(current_line < 2){
+                    current_line++;
                                 
-                }
-            }break;
+                    }
+                }break;
 
-            case _FINISH_:{
-                printf("\n\n=== HASTA LUEGO ===\n");
-                game_over =true;
-                break;
-            }
+                case _FINISH_:{
+                    printf("\n\n=== HASTA LUEGO ===\n");
+                    game_over =true;
+                    break;
+                }
 
             }   
         }
@@ -425,6 +548,26 @@ void reset_game_state() {
     delimiter();
 }
 
+// void reset_game_state() {
+//     vehicle_x = SPAWN_OBJ;
+//     current_line = 1;
+//     inicio = false;
+//     elapsed_seconds = 0;
+//     init_matrices();
+//     xEventGroupClearBits(event_group, ready);
+//     xQueueReset(moveObjectQueue);
+    
+//     // Limpiar estadísticas de debug
+//     reset_debug_counters();
+    
+//     delimiter();
+//     printf("\t\t\n\n\n*************** PRESIONE EL BOTON PARA INICIAR DE NUEVO ***************\n\n\n");
+//     delimiter();
+// }
+
+
+
+
 //funcion terminada 
 //esta funcion establece en que posicion dentro de nuestro liezno aparecera los obstaculos 
 void generate_obstacule(void){
@@ -503,17 +646,7 @@ void update_lanes(){
 //funcion terminadas
 void display_games(void){
 
-    // printf("\033[2J\033[H"); // Limpiar terminal
-    // delimiter();
-
-    static bool first_display = true;
-    
-    if(first_display) {
-        printf("\033[2J\033[H"); // Solo limpiar completamente la primera vez
-        first_display = false;
-    } else {
-        printf("\033[H"); // Solo mover cursor al inicio, no limpiar
-    }
+    printf("\033[2J\033[H");
 
 
     for(int y= 0; y < HEIGTH_SCRE; y++){
@@ -682,4 +815,35 @@ void init_matrices(void) {
 }
 
 
+
+//########################################
+// void debug_stats_task(void *params){
+//     uint32_t last_up = 0, last_down = 0, last_init = 0, last_finish = 0;
+    
+//     while(1) {
+//         // Mostrar contadores de ISR
+//         printf("=== ESTADISTICAS ISR ===\n");
+//         printf("UP: %lu (+%lu)  DOWN: %lu (+%lu)\n", 
+//                debug_isr_count_up, debug_isr_count_up - last_up,
+//                debug_isr_count_down, debug_isr_count_down - last_down);
+//         printf("INIT: %lu (+%lu)  FINISH: %lu (+%lu)\n",
+//                debug_isr_count_init, debug_isr_count_init - last_init,
+//                debug_isr_count_finish, debug_isr_count_finish - last_finish);
+//         printf("Ultimo pin ISR: %lu, Estado: %lu\n", debug_last_pin, debug_pin_state);
+        
+//         // Mostrar estado actual de pines
+//         printf("Estados actuales - UP:%d DOWN:%d INIT:%d FINISH:%d\n",
+//                gpio_get_level(_UP_), gpio_get_level(_DOWN_),
+//                gpio_get_level(_INIT_), gpio_get_level(_FINISH_));
+//         printf("========================\n");
+        
+//         // Guardar valores para calcular incrementos
+//         last_up = debug_isr_count_up;
+//         last_down = debug_isr_count_down;
+//         last_init = debug_isr_count_init;
+//         last_finish = debug_isr_count_finish;
+        
+//         vTaskDelay(3000 / portTICK_PERIOD_MS); // Cada 3 segundos
+//     }
+// }
 
