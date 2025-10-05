@@ -1,0 +1,147 @@
+#include<stdio.h>
+#include<freertos/FreeRTOS.h>
+#include<freertos/task.h>
+#include<freertos/event_group.h>
+#include<freertos/queue.h>
+#include<driver/gpio.h>
+#include<driver/uart.h>
+#include"uart_lib.h"
+#include<esp_log.h>	
+#include<string.h>
+
+
+
+const static char *TAG = "UART1";
+
+static const char lf[] = "\n";
+
+
+void app_main(void)
+{
+
+
+}
+
+//###################################################################
+//seccion de tareas
+void recive_uart_task(void *params){
+
+	
+	uart_event_t event;
+	uint8_t *buffer = (uint8_t*)malloc(uint8_t);
+
+	while(1){
+		
+		if(xQueueReceive(uart_event,(void *)&event,portMAX_DELAY)){
+		
+			memset(buffer, 0 , BUF);
+		
+			switch(event.type){
+			
+				case UART_DATA:{
+
+					//se recivio la infromacion 
+					uart_read_bytes(UART_SEL, buffer,event.size,portMAX_DELAY); //espera hasta que le llegue algo
+					
+					//ahora depende de lo que se reciba veremos que onda 
+					
+					
+
+					for(int i=0; i< event.size; i++){
+					
+						char c =(char)buffer[i]; //sacamos el primer dato del buffer, porque puede haber mas de 1 para poder decidir 
+					
+						if(c => '0' && c <='9'){
+							
+							input_buffer[input_index++] = c;
+							uart_write_byte(UART_SEL,(const char*)&c, sizeof(c));
+						
+						}
+						else if(c == '\n' || c == '\r'){
+						
+							//legamos al final de la linea 
+							if(input_index > 0){
+							
+								//debio de haber ingresado algo al arreglo
+								input_buffer[input_index]= "\0";
+								char ptr= "1";
+								int i=0;
+								uart_write_bytes(UART_SEL,"dato ingresado:",20);
+								while(ptr!="\0"){
+									ptr =input_buffer[i];
+								       	uart_write_bytes(UART_SEL,(const char*)&ptr,sizeof(ptr));
+									i++;	
+								}
+								uart_write_bytes(UART_SEL, lf, 1);
+								
+								
+
+
+
+								memset(intput_buffer,0,256);//limpamos el buffer
+								intput_index= 0;
+							}
+						
+						}
+					
+					}
+					
+				
+				}break;
+			
+			}
+		
+		
+		}
+	
+	
+	
+	}
+
+
+
+
+}
+
+
+
+
+
+//#####################################################################
+//seccion de funciones 
+
+void init_uart(int num_uart, int pin_tx, int pin_rx){
+
+	
+	//definicion predefinida 
+	uart_config_t uart_config = {
+	
+		.baud_rate = 115200,
+		.data_bits = UART_DATA_8_BITS,
+		.party = UART_PARITY_DIABLE,
+		.stop_bits = UART_STOP_BITS_1,
+		.flow_ctrl =UART_HW_FLOWCTRL_DISABLE, 
+		.source_clk = UART_SCLK_DEFAULT,
+	};
+
+
+
+	if(num_uart == UART_NUM_0){
+		//pongamos primero con el valos a trabajar y despues con el otros la verga
+		
+		ESP_ERROR_CHECK(uart_driver_install(UART_SEL,BUF*2, BUF*2,20,&uart_event,0));
+		ESP_ERROR_CHECK(uart_param_config(UART_SEL,&uart_config));
+
+		ESP_ERRO_CHECK(uart_set_pin(UART_SEL,UART_PIN_NO_CHANGE,UART_PIN_NO_CHANGE,UART_PIN_NO_CHAGE,UART_PIN_NO_CHANGE));
+
+		uart_flush(UART_SEL);
+
+		ESP_LOGI(TAG,"UART configurado");
+	}
+
+
+
+
+
+
+
