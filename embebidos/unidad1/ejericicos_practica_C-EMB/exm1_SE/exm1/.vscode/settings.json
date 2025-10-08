@@ -20,7 +20,9 @@
     "cstring": "c",
     "stdio.h": "c",
     "uart.h": "c",
-    "*.inc": "c"
+    "*.inc": "c",
+    "typeinfo": "c",
+    "_ansi.h": "c"
   },
   "idf.portWin": "COM3",
   "idf.flashType": "UART"

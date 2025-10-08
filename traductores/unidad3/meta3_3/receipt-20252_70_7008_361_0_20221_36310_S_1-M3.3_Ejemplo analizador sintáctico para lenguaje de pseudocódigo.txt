@@ -1,0 +1,8 @@
+Your submission was successful!
+Course: 20252_70_7008_361_0_20221_36310_S_1, Traductores(361)
+Assessment: M3.3_Ejemplo analizador sintáctico para lenguaje de pseudocódigo
+
+Submission date: 10/7/25, 4:34 PM (PDT) (Late)
+Submission size: 126.8 KB
+Submitter: ERIK GARCÍA CHÁVEZ
+Confirmation number: bd2594841b964c8cbcd773f15927befe
