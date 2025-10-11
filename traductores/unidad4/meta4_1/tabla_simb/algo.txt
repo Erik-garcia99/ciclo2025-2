@@ -1,5 +1,5 @@
 inicio-programa
-    variables : numeroDeElementos, promedio, i, elemento
+    variables : numeroDeElementos, i, elemento
     leer numeroDeElementos
     promedio = 0
     

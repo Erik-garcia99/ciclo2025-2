@@ -14,10 +14,18 @@ public class PseudoParser{
         this.ts = ts;
     }
 
-    public void analizar(PseudoLexer lexer) throws SyntaxException{
+    public void analizar(PseudoLexer lexer) throws SyntaxException, SemanticException{
         tokens = lexer.getTokens();
 
+        real = new TipoIncorporado("real");
         
+        // SOLUCIÓN: Verificar si "real" ya existe antes de definirlo
+        try {
+            ts.resolver("real"); // Si ya existe, no lo definimos nuevamente
+        } catch (SemanticException e) {
+            // Si no existe, entonces lo definimos
+            ts.definir(real);
+        }
 
         if(Programa()){
             if(indiceToken == tokens.size()){
@@ -27,27 +35,30 @@ public class PseudoParser{
         }
 
         if(ex == null){
-            if(indiceToken < tokens.size()){
-                ex = new SyntaxException("Final de programa", tokens.get(indiceToken).getTipo().getNombre());
-            } else {
-                ex = new SyntaxException("Token adicional al final", "EOF");
-            }
+            ex = new SyntaxException("error de sintaxis");
         }
         throw ex;
     }
-
-    private boolean Programa(){
+    private boolean Programa() throws SemanticException{
         if(match("INICIOPROGRAMA")){
-            if(Enunciados()){
-                if(match("FINPROGRAMA")){
-                    return true;
+            // if(Enunciados()){
+            //     if(match("FINPROGRAMA")){
+            //         return true;
+            //     }
+            // }
+            if(Declaracion()){
+                if(Enunciados()){
+                    if(match(TipoToken.FINPROGRAMA)){
+                        return true;
+                    }
                 }
             }
+
         }
         return false;
     }
 
-    private boolean Enunciados(){
+    private boolean Enunciados() throws SemanticException{
         int indiceAux = indiceToken;
 
 
@@ -62,7 +73,7 @@ public class PseudoParser{
         return false;
     }
 
-    private boolean Enunciado(){
+    private boolean Enunciado() throws SemanticException{
         int indiceAux = indiceToken;
 
         if(tokens.get(indiceToken).getTipo().getNombre().equals("VARIABLE")){
@@ -118,6 +129,51 @@ public class PseudoParser{
         return false;
     }
 
+
+    private boolean Declaracion() throws SemanticException{
+
+        if(match(TipoToken.VARIABLES)){
+            if(match(TipoToken.DOSPUNTOS)){
+                if(match(TipoToken.VARIABLE)){
+                    ts.definir(new Varibale(tokens.get(indiceToken-1).getNombre(),real));
+                    System.out.println("Definida");
+
+                    while(match(TipoToken.COMA)){
+                        if(!match(TipoToken.VARIABLE)){
+                            return false;
+                        }
+
+                        ts.definir(new Varibale(tokens.get(indiceToken-1).getNombre(), real));
+                        System.out.println("Definida");
+                    }
+                    return true;
+                }
+            }
+        }
+
+        return false;
+
+    }
+
+    private boolean Asignacion() throws SemanticException{
+        int indiceAux = indiceToken;
+        Varibale v;
+
+        if(match(TipoToken.VARIABLE)){
+            v = (Varibale) ts.resolver(tokens.get(indiceToken-1).getNombre());
+            System.out.println("Resulta");
+
+            if(match(TipoToken.IGUAL)){
+                if(Expresion()){
+                    return true;
+                }
+            }
+        }
+
+        indiceToken = indiceAux;
+        return false;
+    }
+
     private boolean DeclaracionVariables(){
         int indiceAux = indiceToken;
         
@@ -145,20 +201,20 @@ public class PseudoParser{
         return false;
     }
 
-    private boolean Asignacion(){
-        int indiceAux = indiceToken;
+    // private boolean Asignacion(){
+    //     int indiceAux = indiceToken;
 
-        if(match("VARIABLE")){
-            if(match("IGUAL")){
-                if(Expresion()){
-                    return true;
-                }
-            }
-        }
+    //     if(match("VARIABLE")){
+    //         if(match("IGUAL")){
+    //             if(Expresion()){
+    //                 return true;
+    //             }
+    //         }
+    //     }
 
-        indiceToken = indiceAux;
-        return false;
-    }
+    //     indiceToken = indiceAux;
+    //     return false;
+    // }
 
     private boolean Expresion(){
         int indiceAux = indiceToken;
@@ -222,7 +278,7 @@ public class PseudoParser{
         return false;
     }
 
-    private boolean Si(){
+    private boolean Si() throws SemanticException{
         int indiceAux = indiceToken;
 
         if(match("SI")){
@@ -241,7 +297,7 @@ public class PseudoParser{
         return false;
     }
 
-    private boolean Mientras(){
+    private boolean Mientras() throws SemanticException{
         int indiceAux = indiceToken;
     
         if(match("MIENTRAS")){
@@ -258,7 +314,7 @@ public class PseudoParser{
         return false;
     }
 
-    private boolean Repite(){
+    private boolean Repite() throws SemanticException{
         int indiceAux = indiceToken;
         
         if(match("REPITE")){
