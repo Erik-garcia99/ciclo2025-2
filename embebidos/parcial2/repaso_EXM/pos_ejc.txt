@@ -1,0 +1,9 @@
+////////////////////////////////////////////////
+
+--ejercicio uniendo UART y I2C 
+
+podemos hacer un ejercicio donde ingresamos por UART datos en un ESP lo madnamos l otro y hacemos algo en el otro y lo imprimirmos por UART puede ser que no?, hasta asociar el sensor, a lo mejor y si k no 
+
+
+
+///////////////////////////////////////////////

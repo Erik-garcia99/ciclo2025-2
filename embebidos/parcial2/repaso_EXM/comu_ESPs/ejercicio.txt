@@ -1,0 +1,1 @@
+el ejercicio este solo le vamos a estar mandando 1 a 10 por I2C al slave esclavo solo para conocer como se comunica 
