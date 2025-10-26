@@ -14,5 +14,13 @@
     "--background-index",
     "--query-driver=C:\\Users\\erikG\\.espressif\\tools\\xtensa-esp-elf\\esp-14.2.0_20241119\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-gcc.exe",
     "--compile-commands-dir=${workspaceFolder}\\build"
-  ]
+  ],
+  "files.associations": {
+    "uart_lib.h": "c",
+    "stdlib.h": "c",
+    "esp_log.h": "c",
+    "i2c_types.h": "c"
+  },
+  "idf.portWin": "COM3",
+  "idf.flashType": "UART"
 }

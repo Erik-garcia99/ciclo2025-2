@@ -1,1 +1,2 @@
-el ejercicio este solo le vamos a estar mandando 1 a 10 por I2C al slave esclavo solo para conocer como se comunica 
+el ejercicio este solo le vamos a estar mandando por uart palabras al ESP
+						SALVE e imrpimirlas en el slave para verificar que se paso

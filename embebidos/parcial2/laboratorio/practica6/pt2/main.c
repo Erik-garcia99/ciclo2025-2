@@ -65,6 +65,9 @@ void i2c_init(void)
   };
 
   esp_err_t error = i2c_param_config(I2C_NUM_1, &i2c_config);
+  //en el caso de que no se puedan configurar los parametros del LCD este se queda en un bucle infinito impidiendo que se pueda seguir con el flujo del programa 
+  
+
   if (error != ESP_OK) {
         while(1);
     }
