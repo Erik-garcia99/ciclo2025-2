@@ -1,0 +1,26 @@
+inicio-programa
+    variables: n, prom, i, cal
+
+    leer "cuantas calificaciones", n
+    
+    prom = 0
+    
+    i = 0
+
+    mientras(i < n)
+        leer "da una calificacion", cal
+        prom = prom + cal
+        i = i + 1
+    fin-mientras
+
+    prom = prom / n
+
+    si(prom > 5) entonces
+        escribir "aprobado con : ", prom
+    fin-si
+
+    si(prom == 10) entonces 
+        escribir "excelente"
+    fin-si
+    
+fin-programa

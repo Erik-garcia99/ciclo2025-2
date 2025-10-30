@@ -1,0 +1,8 @@
+Your submission was successful!
+Course: 20252_70_7008_361_0_20221_36310_S_1, Traductores(361)
+Assessment: M5_1_Traductor de pseudocodigo a C y Python
+
+Submission date: 10/28/25, 12:24 AM (PDT)
+Submission size: 165.9 KB
+Submitter: ERIK GARCÍA CHÁVEZ
+Confirmation number: 5a50dfb6b8924db599fe8b10af459a31
