@@ -1,13 +1,15 @@
-#include "wifi_lib.h"
-#include<esp_wifi.h>
-#include<esp_event.h>
+#include"wifi_lib.h"
+#include <esp_wifi.h>
 #include<esp_spiffs.h>
 #include<nvs_flash.h>
 #include<esp_netif.h>
 #include<esp_log.h>
+#include<esp_err.h>
 
 
-static const char *TAG = "AP_CONECT-4_GAME";
+static const char *TAG ="modulo/WIFI";
+
+
 
 void init_spiffs(void){
     esp_vfs_spiffs_conf_t conf ={
@@ -34,6 +36,7 @@ void init_spiffs(void){
         ESP_LOGI(TAG, "SPIFFS: tamanio total %d, usado %d", total, used);
     }
 }
+
 
 
 
