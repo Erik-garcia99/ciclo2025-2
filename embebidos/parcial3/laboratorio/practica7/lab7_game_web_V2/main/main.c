@@ -1,6 +1,16 @@
-//librerias propias
-#include"modulos/GPIO/gpio_lib.h"
-#include"modulos/WIFI/wifi_lib.h"
+//utilidades/livrerias estandares
+#include<stdio.h>
+// #include<stdlib.h>
+// #include<string.h>
+
+//freeRTOS
+#include<freertos/FreeRTOS.h>
+#include<freertos/task.h>
+#include"freertos/queue.h"
+
+//manjeador de errores
+#include<esp_log.h>
+
 
 //WIFI-FLASH
 #include<esp_wifi.h>
@@ -10,16 +20,10 @@
 #include<esp_netif.h>
 #include<esp_http_server.h>
 
-//freeRTOS
-#include<freertos/FreeRTOS.h>
-#include<freertos/task.h>
 
-
-
-//utilidades/livrerias estandares
-#include<stdio.h>
-// #include<stdlib.h>
-// #include<string.h>
+//librerias propias
+#include"modulos/GPIO/gpio_lib.h"
+#include"modulos/WIFI/wifi_lib.h"
 
 
 //macros
@@ -43,7 +47,9 @@ typedef struct {
 static const char *TAG = "AP_CONECT-4_GAME";
 static GameState game_state;
 
-// static const char *TAG = "conecta4";
+
+static QueueHandle_t button_queue = NULL;
+
 
 // //funciones
 
@@ -57,6 +63,9 @@ void proccess_intr(void *params);
 
 void app_main(void){
 
+
+    button_queue = xQueueCreate(10, sizeof(uint8_t));
+
     esp_err_t ret = nvs_flash_init();
     if(ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND){
         ESP_ERROR_CHECK(nvs_flash_erase());
@@ -66,13 +75,15 @@ void app_main(void){
     //servidor - WIFI
     init_spiffs();
     wifi_init_softap();
-
+    start_web_server();
 
     //funciones de juego inicales 
     //inicamos el juego 
 
 
     //perifericos
+
+    get_queue(&button_queue);
 
     gpio_init();
     type_int();
@@ -85,9 +96,22 @@ void app_main(void){
 
 void proccess_intr(void *params){
 
+    uint32_t pin_number;
+
     while(1){
 
-        
+        if(xQueueReceive(button_queue,&pin_number,portMAX_DELAY)){
+            //ENTONCES VERIFICAMOS QUE ES LO QUE RECIBIO desde la ISR
+            
+            //si no es un jugador entonces es el otro 
+            if(pin_number == PLAYER_1){
+                ESP_LOGI(TAG, "jugadro 1 finalizo el juego");
+            }
+            else{
+                ESP_LOGI(TAG, "jugadro 2 finalizo el juego");
+            }
+
+        }
 
 
     }

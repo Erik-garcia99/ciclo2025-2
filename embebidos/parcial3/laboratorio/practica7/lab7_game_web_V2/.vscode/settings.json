@@ -18,6 +18,12 @@
   "files.associations": {
     "queue.h": "c",
     "stdlib.h": "c",
-    "stdio.h": "c"
-  }
+    "stdio.h": "c",
+    "http_parser.h": "c",
+    "esp_attr.h": "c",
+    "gpio_lib.h": "c",
+    "freertos.h": "c"
+  },
+  "idf.flashType": "UART",
+  "idf.portWin": "COM3"
 }

@@ -1,15 +1,30 @@
-#include"gpio_lib.h"
-#include<driver/gpio.h>
-#include<esp_timer.h>
+#include<stdio.h>
+
+#include <freertos/FreeRTOS.h>
+#include <freertos/queue.h>
+
 #include "esp_attr.h"
 
-#define PLAYER_1 17
-#define PLAYER_2 16
+#include <driver/gpio.h>
+#include <esp_timer.h>
+#include "esp_attr.h"
+
+#include"gpio_lib.h"
+
+
 #define DEBOUNCE_TIME 200000
 
 static uint64_t LAST_PRESS_PY1 = 0;
 static uint64_t LAST_PRESS_PY2 = 0;
 
+QueueHandle_t queue_current=NULL;
+
+
+void get_queue(QueueHandle_t *queue){
+    if (queue != NULL) {
+        queue_current = *queue;
+    }
+}
 
 void gpio_init(void) {
     // Usaremos el GPIO 17 para jugador 1
@@ -51,7 +66,7 @@ void IRAM_ATTR gpio_isr_handler(void *args) {
             if((current_time - LAST_PRESS_PY1) > DEBOUNCE_TIME) {
                 if(gpio_get_level(pin_number) == 0) {
                     LAST_PRESS_PY1 = current_time;
-                    // Aquí podrías enviar a una cola si la tuvieras
+                    xQueueSendFromISR(queue_current, &pin_number,NULL);
                 }
             }
             break;
@@ -61,7 +76,7 @@ void IRAM_ATTR gpio_isr_handler(void *args) {
             if((current_time - LAST_PRESS_PY2) > DEBOUNCE_TIME) {
                 if(gpio_get_level(pin_number) == 0) {
                     LAST_PRESS_PY2 = current_time;
-                    // Aquí podrías enviar a una cola si la tuvieras
+                    xQueueSendFromISR(queue_current, &pin_number,NULL);
                 }
             }
             break;

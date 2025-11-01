@@ -1,10 +1,20 @@
-#include"wifi_lib.h"
+
+//libereias estandares
+#include<string.h>
+
+//manejo de erroes
+#include<esp_log.h>
+#include<esp_err.h>
+
+//librerias wifi-servidor
 #include <esp_wifi.h>
 #include<esp_spiffs.h>
 #include<nvs_flash.h>
 #include<esp_netif.h>
-#include<esp_log.h>
-#include<esp_err.h>
+#include<esp_https_server.h>
+
+//libreias personalziadas 
+#include"wifi_lib.h"
 
 
 static const char *TAG ="modulo/WIFI";
@@ -72,3 +82,48 @@ void wifi_init_softap(void){
 }
 
 
+esp_err_t root_get_handler(httpd_req_t *req){
+
+    FILE *file = fopen("/spiffs/index.html", "r");
+    if(file==NULL){
+        ESP_LOGE(TAG,"no se pudo abrir el archivo index.html");
+        httpd_resp_send_404(req);
+        return ESP_FAIL;
+    }
+
+    char line[255];
+    while (fgets(line, sizeof(line), file)){
+        //req solicitud HTTP en ete caso GET por lo que mandara al navegador lo que haya en el HTML, y la line son los tronoz que estara enviando hasta que este llege al final los envia en pedazos de 255 bytes
+        httpd_resp_sendstr_chunk(req, line);
+    }
+
+    //cerramos la comunicacion
+
+    httpd_resp_sendstr_chunk(req, NULL);
+    fclose(file);
+    return ESP_OK;
+    
+
+}
+
+
+void start_web_server(void){
+
+    
+    httpd_handle_t server = NULL;
+    httpd_config_t config = HTTPD_DEFAULT_CONFIG();
+
+    //este metpp uri es la direccion raiz que se muestra, es metodo GET 
+
+    if(httpd_start(&server,&config) == ESP_OK){
+        httpd_uri_t root_uri={
+            .uri="/",
+            .method = HTTP_GET,
+            .handler = root_get_handler,
+        };
+
+        //regritamos la uri que respondera a la peticion 
+        httpd_register_uri_handler(server, &root_uri);
+    }
+
+}
