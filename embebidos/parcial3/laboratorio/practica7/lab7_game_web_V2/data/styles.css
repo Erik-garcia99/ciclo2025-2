@@ -1,0 +1,41 @@
+body {
+    font-family: Arial, sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.current-turn {
+    font-weight: bold;
+    color: #0066cc;
+    margin: 10px 0;
+}
+
+.game-over {
+    font-weight: bold;
+    color: #cc0000;
+    margin: 10px 0;
+    font-size: 1.2em;
+}
+
+table {
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+td {
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    vertical-align: middle;
+    font-weight: bold;
+}
+
+form {
+    margin: 10px 0;
+}
+
+input, button {
+    padding: 5px;
+    margin: 5px;
+}

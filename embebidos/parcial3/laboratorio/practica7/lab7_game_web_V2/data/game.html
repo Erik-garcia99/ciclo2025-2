@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Conecta 4 - Juego</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Conecta 4</h1>
+    
+    <div id="gameInfo">
+        <div id="currentPlayer"></div>
+        <div id="playersInfo"></div>
+        <div id="winnerMessage"></div>
+    </div>
+
+    <div id="gameBoard"></div>
+
+    <div id="controls">
+        <form onsubmit="makeMove(); return false;">
+            <label>Columna (1-7): <input type="number" id="column" min="1" max="7" required></label>
+            <button type="submit">Jugar</button>
+        </form>
+    </div>
+
+    <script>
+        function updateGame() {
+            fetch('/game_state')
+                .then(response => response.json())
+                .then(data => {
+                    updateBoard(data.board);
+                    updateGameInfo(data.info);
+                    
+                    if (data.info.game_over) {
+                        document.getElementById('controls').style.display = 'none';
+                    }
+                });
+        }
+
+        function updateBoard(board) {
+            const gameBoard = document.getElementById('gameBoard');
+            let html = '<table border="1">';
+            
+            for (let row = 0; row < board.length; row++) {
+                html += '<tr>';
+                for (let col = 0; col < board[row].length; col++) {
+                    const piece = board[row][col];
+                    html += `<td>${piece !== ' ' ? piece : '&nbsp;'}</td>`;
+                }
+                html += '</tr>';
+            }
+            
+            html += '</table>';
+            gameBoard.innerHTML = html;
+        }
+
+        function updateGameInfo(info) {
+            const currentPlayerEl = document.getElementById('currentPlayer');
+            const playersInfoEl = document.getElementById('playersInfo');
+            const winnerMessageEl = document.getElementById('winnerMessage');
+            
+            if (info.game_over) {
+                currentPlayerEl.textContent = '';
+                winnerMessageEl.textContent = info.winner_message;
+                winnerMessageEl.className = 'game-over';
+            } else {
+                const currentPlayer = info.current_player === 1 ? info.player1_name : info.player2_name;
+                currentPlayerEl.textContent = `Turno de: ${currentPlayer}`;
+                currentPlayerEl.className = 'current-turn';
+                winnerMessageEl.textContent = '';
+            }
+            
+            playersInfoEl.innerHTML = `
+                <p><strong>${info.player1_name}</strong> (O): ${info.player1_chips} fichas</p>
+                <p><strong>${info.player2_name}</strong> (X): ${info.player2_chips} fichas</p>
+            `;
+        }
+
+        function makeMove() {
+            const column = document.getElementById('column').value;
+            
+            fetch('/move', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'col=' + column
+            })
+            .then(response => response.text())
+            .then(result => {
+                if (result === 'OK') {
+                    setTimeout(updateGame, 100);
+                    document.getElementById('column').value = '';
+                } else {
+                    alert('Movimiento inválido: ' + result);
+                }
+            });
+        }
+
+        setInterval(updateGame, 1000);
+        updateGame();
+    </script>
+</body>
+</html>

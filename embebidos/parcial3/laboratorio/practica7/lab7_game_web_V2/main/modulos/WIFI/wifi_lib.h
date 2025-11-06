@@ -1,6 +1,7 @@
 #ifndef WIFI_LIB_H
 #define WIFI_LIB_H
 
+#include"game.h"
 
 /**
  * 
@@ -44,5 +45,49 @@ void start_web_server(void);
  * @return ESP_OK -> cunado se puede abri con exito 
 */
 esp_err_t root_get_uri(httpd_req_t *req);
+
+
+/**
+ * @brief sirve la pagina del juego  
+ * 
+ * @param req -> la peticion
+ * 
+ * @return ESP_FAIL si no se pudo cargar la pagina 
+ * @return ESP_OK si lo pudo hacer
+*/
+esp_err_t game_get_handler(httpd_req_t *req);
+
+/**
+ * 
+ * @brief entrega el codigo CSS para darle un poco de color a la pagina 
+ * 
+ * 
+*/
+esp_err_t css_get_handler(httpd_req_t *req);
+
+/**
+ * 
+ * @brief recibe los datos de los jugadores 
+ * 
+ * @return ESP_FAIL -> ocurrio un error al pasar datos de font -> back
+ * @return ESP_OK -> se recibio datos con exito 
+ * 
+ * exp
+ */
+esp_err_t movent_handler(httpd_req_t *req);
+
+
+/**
+ * @brief esta es la pagina que recibe los nombres de los judadores  
+ * 
+ * 
+*/
+esp_err_t start_player(httpd_req_t *req);
+
+
+//exp
+esp_err_t game_state_handler(httpd_req_t *req);
+
+
 
 #endif

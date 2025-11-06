@@ -22,7 +22,8 @@
     "http_parser.h": "c",
     "esp_attr.h": "c",
     "gpio_lib.h": "c",
-    "freertos.h": "c"
+    "freertos.h": "c",
+    "semphr.h": "c"
   },
   "idf.flashType": "UART",
   "idf.portWin": "COM3"

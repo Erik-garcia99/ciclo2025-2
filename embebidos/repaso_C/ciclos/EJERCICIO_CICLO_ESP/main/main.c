@@ -20,7 +20,12 @@ factorial es la multiplicacion de los numeros enteros e incluso el mismo numero
 //factorual ya esta chilo 
 int factorial(int intervalo){
 
+    if(intervalo == 0){
+        return 1;
+    }
+
     int suma = 1;
+    
     for(int i=1; i <= intervalo ; i++){
 
         //un facotural es la suma de todos sus valores anteriores hasta el
@@ -41,7 +46,7 @@ void scale(int numer_scaled){
 
 void app_main(void)
 {
-    int euler =0;
+    int euler;
     int sumador = 0; 
 
     int i;
@@ -49,7 +54,15 @@ void app_main(void)
     for(i=0 ; i < 10; i++){
 
         printf("%d -> ", i);
+        //inciamso el termino de euler
+        euler = SCALE; 
+
+
         for(j=0; j< 10 && j<=i;j++){
+
+
+            int fac = factorial(j);
+            euler += SCALE/fac;
 
             // if(j==1){
             //     continue;
@@ -74,14 +87,7 @@ void app_main(void)
             // printf(" - ");
         }
 
-
-        int fac = factorial(j);
-        euler += 1 + (SCALE/fac);
-
-        printf(" - ");
         scale(euler);
-        printf("%d",euler);
-        printf(" - ");
         printf("\n");
 
     }

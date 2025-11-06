@@ -6,8 +6,8 @@
 #include <freertos/queue.h>
 
 // extern QueueHandle_t button_queue;
-#define PLAYER_1 17
-#define PLAYER_2 16
+#define PLAYER_1 18
+#define PLAYER_2 19
 
 /**
  *  @brief funcion para establecer los GPIO
