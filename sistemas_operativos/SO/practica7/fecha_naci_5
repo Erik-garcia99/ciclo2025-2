@@ -1,0 +1,37 @@
+#!/bin/bash
+
+
+echo "ingrese su fecha de nacimineto dd/mm/aaaa"
+read date
+
+
+if [ -z "$date" ]; then
+	echo "debe de ingresar una fecha"
+
+else
+
+	if [[ $date =~ ^[0-9]{2}/[0-9]{2}/[0-9]{4}$ ]]; then
+	
+		
+		day=`echo $date | cut -d'/' -f1`
+		month=`echo $date | cut -d'/' -f2`
+		year=`echo $date | cut -d'/' -f3`
+
+		if [ $month -gt 12 ] || [ $month -lt 1 ]; then
+			echo "mes incorrecto, debe ser entre 1 - 12"
+			
+		else
+			cal $month $year
+
+		fi	
+
+
+
+	else
+		echo "formato incorrecto: formate dd/mm/aaa"	
+	fi	
+
+
+fi
+
+

@@ -1,0 +1,14 @@
+#!/bin/bash 
+
+if [ -z $1 ] || [ -z $2 ]; then 
+	
+	#si algunos de los 3 falta entonces entraria aqui 
+
+	echo "nombre incompleto"
+
+else
+	echo "hola como estas $*"
+
+fi
+
+

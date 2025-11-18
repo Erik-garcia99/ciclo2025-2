@@ -1,0 +1,32 @@
+#!/bin/bash
+
+
+echo "ingrese lo largo del terreno"
+read largo
+
+echo "ingrese lo alto del terreno"
+read alto
+
+
+#calcular el permitero
+
+suma_lados=$((largo + alto))
+perimetro=$((2 * $suma_lados))
+
+
+costo_material=$(($perimetro * 150))
+
+costo_mano_obra=$(($perimetro * 100))
+
+costo_total=$(($costo_material + $costo_mano_obra))
+
+
+echo "perimetro del terrno: $perimetro"
+echo "costo del material: $costo_material"
+echo "costo de la mano de obra: $costo_mano_obra"
+echo "costo total de la obra: $costo_total"
+
+
+
+
+

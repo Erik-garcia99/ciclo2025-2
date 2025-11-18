@@ -1,0 +1,47 @@
+#!/bin/sh
+
+
+echo "ingrese el nombre del primer archivo"
+
+read archivo1
+
+echo "ingrese el nombre del segundo archivo"
+read archivo2
+
+echo "ingrese el nombre del tercer archivo"
+read archivo3
+
+
+
+
+#es importante es usar las comillas para la comparacion de otro modo siempre devolvera verdadero, 
+if [ -e "$archivo1" ] && [ -e "$archivo2" ] && [ -e "$archivo3" ]; then
+	
+	lower=`tr "[A-Z]" "[a-z]" <$archivo1`
+	
+	number_car=`tr "[0-9]" "*" <$archivo2`
+	
+	imprimir=`cat $archivo3`
+
+	echo "archivo 1 mayusculas -> minusculas $lower"
+	echo "archivo 2 numeros -> asteriscos $number_car"
+	echo "el archivo 3 permanece igual $imprimir"
+	
+
+else
+	#aqui lo que estoy haceindo es como mapear que archivo es el que no existe, ene el caso que un archivo no exista
+	#la condicion me dara verdadera porqie marcara como falsa pero al negarla sera verdadera
+	#y los archivos verdaeros que si estan seran faltos por lo que no entraran
+	if [ ! -e "$archivo1" ]; then
+		echo "el archivo $archivo1 no existe en la ruta"
+
+	elif [ ! -e "$archivo2" ]; then
+		echo "el archivo $archivo2 no existe en la ruta"
+
+	else
+	       echo "el archivo $archivo3 no existe en la ruta"	
+	fi		
+	
+fi
+
+

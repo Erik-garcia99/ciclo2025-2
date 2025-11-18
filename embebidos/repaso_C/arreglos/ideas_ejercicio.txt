@@ -1,0 +1,39 @@
+-> podemos introducir en el ejercciio por medio de 2 maneras por medio de UART
+o mandando el vector de manera estaticas o un apuntador a esta, sea cual sea 
+	-si es por medio de un arreglo estatico solo se manda a la funcion que
+	se encarga de ordenar la funcion 
+
+	-si es por UART debemos de tratar los datos para converitrlos en
+	numeros . 
+
+	-sea cual sea el modo la funcion solo recibira el apuntador al inicio
+	del vectro
+
+
+-> sea cual sea la manera la funcion que ordena recibira una cadena cruda de
+tipo uint8_t
+
+
+--> como ordenamos el arreglo de menor a mayor?? 
+
+necesito saber si el numero que estoy comparando en este momento es el
+elemento mas chico del arreglo, 
+
+->inicamos vairbale booleana (intercambio) el cual si es true indica que hubo
+cambio, si es FLASE indisca que no ubo intercambio por lo que ese elemnto
+encoentro su lugar dentro de la lista.
+-> tomo el x elemento del arreglo en x posicion 
+-> comparo si el elemtno que tome es mas grande que con el sigueinte, si no es
+mas grande quiere decir que el segundo elemento es mas grande por lo que el
+que estoy comparando permanece igual, 
+-> si es el segundo es mas chico se intercambia los indices 
+-> si hubo intercambio indico un true, hubo un intercambio debemos de volver a
+empezar a relizar las comparaciones desde el indice en donde ser realiza el
+intercambio, el de orden mayor, por lo que los indices deben de reinicarse 
+
+
+
+
+
+
+ 

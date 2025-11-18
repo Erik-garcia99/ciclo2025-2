@@ -1,0 +1,31 @@
+#!/bin/bash
+
+
+
+echo "ingrese el nombre real (nombre de usuario): "
+read nombre
+
+
+user_name=`w | grep "$nombre" | cut -d" " -f1`
+
+
+if [ -z "$user_name" ]; then
+
+	echo "usuario no encontrado encontrado"
+	exit 1
+fi
+
+
+echo "el usaurio $user_name tiene los siguientes proceso"
+
+ps -u "$user_name"
+
+#echo $procesos
+
+echo "ingrese el mensaje a enviar:"
+read mensaje
+
+send=`"$mensaje" | write "$user_name"`
+
+
+

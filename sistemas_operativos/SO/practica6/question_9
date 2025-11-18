@@ -1,0 +1,50 @@
+#!/bin/bash
+
+echo "ingrese el nombre del archivo"
+read archivo
+
+#debemos de sacar el substring de cada uno para saber que permiso se le otorgan
+
+
+if [ -e "$archivo" ]; then
+
+	echo "ingrese los permisos para usuario (EJ:rwx): "
+	read perm_user
+
+	echo "ingrese los permisos para grupo (EJ: r-x):"
+	read perm_group
+
+	echo "ingrese los permisos para otros:"
+	read perm_other
+
+
+	user_ch=`echo "$perm_user" | tr -d '-'`
+	group_ch=`echo "$perm_group" | tr -d '-'`
+	other_ch=`echo "$perm_other" | tr -d '-'`
+
+	
+	permisos="u=$user_ch,g=$group_ch,o=$other_ch"
+
+	chmod $permisos "$archivo"
+	
+	echo "persmisos cambiados"
+
+	ls -l
+
+
+else
+	echo "el archivo $archivo no existe"
+fi
+
+
+
+
+
+
+
+
+
+
+
+
+

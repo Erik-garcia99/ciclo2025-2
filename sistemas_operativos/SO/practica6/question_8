@@ -1,0 +1,32 @@
+#!/bin/bash
+
+
+echo "ingrese un numero:"
+read lineas_n
+
+echo "ingrese un archivo"
+read archivo
+
+
+#antes que nada deberiamos de verificar que existan estos docuemtnos 
+
+if [ -e "$archivo" ]; then
+	
+	echo "las primeras $lineas_n del archivo"
+
+	head -"$lineas_n" <$archivo
+	
+	#echo $cabeza
+
+	echo "las ultimas $lineas_n del archivo"
+	
+	tail -"$lineas_n" <$archivo
+
+else
+	echo "el archivo $archivo no existe prueba de nuevo"
+
+fi
+
+
+
+

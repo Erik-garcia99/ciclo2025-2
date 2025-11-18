@@ -1,0 +1,30 @@
+#!/bin/bash
+
+echo "cual es la capital de bulgaria?"
+read capital
+
+cont=0
+
+while [ $capital != "sofia" ];
+do
+	#ingreso algo, pero debemos de verificar que si lo haya hecho 
+	if [ -z $capital ]; then
+
+		echo "debe de ingresar algo, vuelva a intentarlo"
+
+	else
+		echo "$capital no es la capital de bulgaria, intente de nuevo"
+	fi
+	
+	cont=$((cont+1))
+
+	echo "cual es la capital de bulgaria?"
+	read capital
+
+done
+
+echo "fueron $cont intentos"
+
+
+
+
