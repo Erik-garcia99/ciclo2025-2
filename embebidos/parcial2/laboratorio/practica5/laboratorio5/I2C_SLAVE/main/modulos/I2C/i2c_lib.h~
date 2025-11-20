@@ -11,7 +11,6 @@
  * 
  * @brief general 
  * 
- * este modulo sera para un maestro y esclavo el cual sea otro ESP32 o pudee ser genreal??hmmmm, veremos que pasa 
  * 
  * 
  * @attention la libreria solo permite direcciones de 7 bits
@@ -42,12 +41,12 @@
  * 
  * 
  */
-// void i2c_master_init(i2c_port_num_t num_i2c,gpio_num_t pin_sda, gpio_num_t pin_scl, uint8_t slave_addr, uint32_t speed, i2c_master_bus_handle_t *bus_handle, i2c_master_dev_handle_t *dev_handle);
+
 
 void i2c_master_init(i2c_port_num_t num_i2c, gpio_num_t pin_sda, gpio_num_t pin_scl, uint32_t speed);
 
 
-//ahora aqui la funcion para ser i2c slave 
+
 
 /**
  * 
@@ -64,8 +63,6 @@ void i2c_master_init(i2c_port_num_t num_i2c, gpio_num_t pin_sda, gpio_num_t pin_
  * 
  * 
  */
-
-// void i2C_slave_init(i2c_port_num_t num_i2c,gpio_num_t pin_sda, gpio_num_t pin_scl,uint8_t slave_addr, i2c_slave_dev_handle_t *slave_handle ,uint32_t buff_tx, uint32_t buff_rx);
 
 void i2C_slave_init(i2c_port_num_t num_i2c, gpio_num_t pin_sda, gpio_num_t pin_scl, uint8_t slave_addr);
 
