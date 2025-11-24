@@ -1,0 +1,16 @@
+Esta práctica se realiza en equipo de dos personas.
+
+Adjunte los siguientes archivos:
+
+Un archivo pdf con su reporte de práctica. Un reporte por equipo. Las "Conclusiones y comentarios" y "Dificultades en el desarrollo" son individuales.
+Un archivo zip con su código fuente (únicamente los archivos .c y .h).  
+
+
+Favor de consultar los pasos del documento "SD Card" que está en Moodle que se vieron en clase:
+
+Configurar parámetros cuando se monta la SD card mediante el sistema de archivos FAT. Esto se realiza con la estructura esp_vfs_fat_sdmmc_mount_config_t.
+Configurar un host para comunicarse con una SD card a través de SPI. Por medio de la estructura sdmmc_host_t. 
+Inicializar un dispositivo SD SPI. Con la estructura sdspi_device_config_t.
+Inicializar el bus SPI de la forma convencional, es decir, con la estructura spi_bus_config_t y la función spi_bus_initialize. Tal como se vió en la clase de SPI (puede consultar la presentación "SPI" en Moodle).
+Montar la SD card con el sistema de archivos FAT y registrar en el Virtual File System (VFS). Por medio de la función esp_vfs_fat_sdspi_mount.
+Posteriormente se pueden crear, escribir, leer y borrar archivos usando las funciones de C.
