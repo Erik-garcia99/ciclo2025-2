@@ -1,0 +1,16 @@
+DEFINIR contador COMO ENTERO
+DEFINIR limite COMO ENTERO
+DEFINIR mensaje COMO CADENA
+
+contador = 1
+limite = 3
+mensaje = "Hola"
+
+ESCRIBIR "Iniciando ciclo MIENTRAS"
+
+MIENTRAS contador <= limite HACER
+    ESCRIBIR mensaje, " - Iteración: ", contador
+    contador = contador + 1
+FINMIENTRAS
+
+ESCRIBIR "Ciclo terminado"

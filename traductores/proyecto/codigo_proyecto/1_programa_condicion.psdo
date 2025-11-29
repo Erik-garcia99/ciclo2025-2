@@ -1,0 +1,13 @@
+DEFINIR numero1 COMO ENTERO
+DEFINIR numero2 COMO ENTERO
+DEFINIR resultado COMO ENTERO
+LEER numero1
+LEER numero2
+
+SI numero1 > numero2 ENTONCES
+	resultado = numero1
+SINO
+
+resultado = numero2
+FINSI
+ESCRIBIR "El numero mayor es:", resultado

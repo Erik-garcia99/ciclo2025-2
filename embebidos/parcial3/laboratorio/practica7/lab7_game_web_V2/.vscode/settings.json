@@ -23,7 +23,8 @@
     "esp_attr.h": "c",
     "gpio_lib.h": "c",
     "freertos.h": "c",
-    "semphr.h": "c"
+    "semphr.h": "c",
+    "wifi_lib.h": "c"
   },
   "idf.flashType": "UART",
   "idf.portWin": "COM3"

@@ -1,0 +1,26 @@
+DEFINIR area COMO REAL
+
+TIPO Rectangulo
+    DEFINIR base COMO REAL
+    DEFINIR altura COMO REAL
+    DEFINIR nombre COMO CADENA
+FINTIPO
+
+DEFINIR miRectangulo COMO Rectangulo
+
+ESCRIBIR "--- Test de Estructuras ---"
+
+
+miRectangulo.base = 10.5
+miRectangulo.altura = 4.0
+miRectangulo.nombre = "Rectangulo Principal"
+
+
+ESCRIBIR "Calculando area de: ", miRectangulo.nombre
+ESCRIBIR "Base: ", miRectangulo.base
+ESCRIBIR "Altura: ", miRectangulo.altura
+
+
+area = miRectangulo.base * miRectangulo.altura
+
+ESCRIBIR "El area total es: ", area

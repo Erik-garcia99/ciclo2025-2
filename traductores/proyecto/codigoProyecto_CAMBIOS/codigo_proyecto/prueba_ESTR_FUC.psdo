@@ -1,0 +1,42 @@
+TIPO Producto
+    DEFINIR precio COMO REAL
+    DEFINIR cantidad COMO ENTERO
+    DEFINIR nombre COMO CADENA
+FINTIPO
+
+DEFINIR precioInput COMO REAL
+DEFINIR cantInput COMO ENTERO
+DEFINIR totalPagar COMO REAL
+
+FUNCION ProcesarVenta REAL (p COMO REAL, c COMO ENTERO)
+    DEFINIR tempProd COMO Producto
+    DEFINIR subtotal COMO REAL
+
+    ESCRIBIR "   [Funcion] Creando estructura temporal..."
+    
+    tempProd.precio = p
+    tempProd.cantidad = c
+    tempProd.nombre = "Venta Local"
+
+    ESCRIBIR "   [Funcion] Procesando: ", tempProd.nombre
+    ESCRIBIR "   [Funcion] Precio interno: ", tempProd.precio
+    
+
+    subtotal = tempProd.precio * tempProd.cantidad
+    
+    RETORNAR subtotal
+FINFUNCION
+
+ESCRIBIR "--- SISTEMA DE VENTAS ---"
+ESCRIBIR "Ingrese precio del producto:"
+LEER precioInput
+ESCRIBIR "Ingrese cantidad:"
+LEER cantInput
+
+ESCRIBIR "Llamando a funcion..."
+
+totalPagar = ProcesarVenta(precioInput, cantInput)
+
+ESCRIBIR "-------------------------"
+ESCRIBIR "Venta procesada con exito."
+ESCRIBIR "Total a pagar: ", totalPagar

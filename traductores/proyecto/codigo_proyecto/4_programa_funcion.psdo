@@ -1,0 +1,11 @@
+DEFINIR numero COMO ENTERO
+DEFINIR resultado COMO ENTERO
+
+FUNCION CalcularCuadrado ENTERO (x COMO ENTERO)
+    RETORNAR x * x
+FINFUNCION
+
+LEER numero
+ESCRIBIR "Llamando a funcion..."
+resultado = CalcularCuadrado(numero)
+ESCRIBIR "El cuadrado es: ", resultado

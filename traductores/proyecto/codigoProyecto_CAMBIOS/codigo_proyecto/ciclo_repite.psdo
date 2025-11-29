@@ -1,0 +1,18 @@
+
+DEFINIR tabla COMO ENTERO
+DEFINIR i COMO ENTERO
+DEFINIR resultado COMO ENTERO
+
+ESCRIBIR "¿Qué tabla de multiplicar desea ver?"
+LEER tabla
+
+ESCRIBIR "=== Tabla del ", tabla, " ==="
+
+i = 1
+REPITE 10 VECES
+    resultado = tabla * i
+    ESCRIBIR tabla, " x ", i, " = ", resultado
+    i = i + 1
+FINREPITE
+
+ESCRIBIR "Fin de la tabla"

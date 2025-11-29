@@ -1,0 +1,64 @@
+TIPO Producto
+    DEFINIR nombre COMO CADENA
+    DEFINIR precio COMO REAL
+    DEFINIR cantidad COMO ENTERO
+    DEFINIR categoria COMO CADENA
+FINTIPO
+
+DEFINIR totalVenta COMO REAL
+DEFINIR productoActual COMO Producto
+
+FUNCION ProcesarProducto REAL (item COMO Producto)
+    DEFINIR subtotal COMO REAL
+    DEFINIR i COMO ENTERO
+    DEFINIR descuento COMO REAL
+    
+    subtotal = 0
+    i = 1
+    
+    ESCRIBIR "   [Función] Procesando: ", item.nombre
+    ESCRIBIR "   [Función] Precio unitario: $", item.precio
+    
+    MIENTRAS i <= item.cantidad HACER
+        SI item.categoria == "ELECTRONICA" ENTONCES
+            
+            descuento = item.precio * 0.10
+            subtotal = subtotal + (item.precio - descuento)
+            ESCRIBIR "     + Unidad ", i, " (con descuento): $", (item.precio - descuento)
+        SINO
+            
+            subtotal = subtotal + item.precio
+            ESCRIBIR "     + Unidad ", i, " (sin descuento): $", item.precio
+        FINSI
+        i = i + 1
+    FINMIENTRAS
+    
+    ESCRIBIR "   [Funcion] Subtotal calculado: $", subtotal
+    
+    RETORNAR subtotal
+FINFUNCION
+
+
+ESCRIBIR "   SISTEMA DE PROCESAMIENTO DE VENTAS   "
+ESCRIBIR ""
+
+productoActual.nombre = "Laptop Gamer"
+productoActual.precio = 15000.50
+productoActual.cantidad = 3
+productoActual.categoria = "ELECTRONICA"
+
+ESCRIBIR "Producto a procesar:"
+ESCRIBIR "  Nombre: ", productoActual.nombre
+ESCRIBIR "  Precio: $", productoActual.precio
+ESCRIBIR "  Cantidad: ", productoActual.cantidad
+ESCRIBIR "  Categoria: ", productoActual.categoria
+ESCRIBIR ""
+
+
+ESCRIBIR "Ejecutando función con estructura como parametro..."
+totalVenta = ProcesarProducto(productoActual)
+
+ESCRIBIR ""
+ESCRIBIR "VENTA FINALIZADA"
+ESCRIBIR "Total a pagar: $", totalVenta
+ESCRIBIR ""

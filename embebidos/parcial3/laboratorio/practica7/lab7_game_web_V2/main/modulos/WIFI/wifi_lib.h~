@@ -27,7 +27,7 @@ void wifi_init_softap(void);
 
 /**
  * 
- * @brief funcion que monta los manejadores de las diferentes peticiones, paginas que se muestras o se solicita
+ * @brief funcion que  
  * 
  * 
 */
