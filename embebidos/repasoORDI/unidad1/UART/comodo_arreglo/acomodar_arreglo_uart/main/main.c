@@ -44,6 +44,7 @@ esp_err_t uart_init();
 
 
 uint8_t *ingreso_arreglo(int tam_arreglo);
+uint8_t *sort_array(uint8_t *array, int tam_arreglo);
 
 
 //tareas
@@ -132,7 +133,7 @@ void task_receive_uart(void *params){
 
                     ///ya estamos reciviendo los datos 
 
-                    int receive = uart_read_bytes(UART_SEL, buffer, event.size, portMAX_DELAY);
+                    uart_read_bytes(UART_SEL, buffer, event.size, portMAX_DELAY);
 
                     //ya renemos los datos recibidos 
 
@@ -209,11 +210,20 @@ void main_task(void *params){
             
         }
 
+        //ya recibio los datos del arreglo 
         array=ingreso_arreglo(tamanio_final_arreglo);
 
-        for(int i=0; i< tamanio_final_arreglo ; i++){
+        array= sort_array(array, tamanio_final_arreglo);
 
-            ESP_LOGI(TAG, "dato: %d", array[i]);
+        char buffer[128];
+
+        for(int i=0; i<tamanio_final_arreglo;i++ ){
+
+            char mess[]="dato : ";
+            uart_write_bytes(UART_SEL, mess, strlen(mess));
+            sprintf(buffer, "dato:%d\n\r", array[i]);
+
+            uart_write_bytes(UART_SEL, buffer, strlen(buffer));
 
         }
 
@@ -241,4 +251,30 @@ uint8_t *ingreso_arreglo(int tam_arreglo){
     }
 
     return array_local;
+}
+
+
+uint8_t *sort_array(uint8_t *array, int tam_arreglo){
+
+
+    uint8_t *aux= array; 
+    //este va  llegar hasta el penuntumo elementos del arreglo.
+    for(int i=0; i < tam_arreglo-1; i++){
+        //este irea un elementos mas
+        for(int j=i+1;j < tam_arreglo ; j++){
+            uint8_t elm_i = aux[i];
+            uint8_t elm_j = aux[j];
+
+            if(elm_i > elm_j){
+                aux[j]= elm_i;
+                aux[i]=elm_j;
+            }
+            else if(elm_i == elm_j){
+                continue;
+            }
+        }
+    }
+
+    return aux;
+
 }
